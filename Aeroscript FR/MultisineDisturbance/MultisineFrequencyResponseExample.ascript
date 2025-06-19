@@ -1,0 +1,117 @@
+import "Multisine.a1lib" as static
+
+//Frequency Response Settings
+var $collectionAxes[] as axis = [X,Y,Z] //axes to collect data
+var $excitationAxis as axis = X //axis to inject multisine disturbance
+var $startFreq as real = 10.0 //Hz
+var $endFreq as real = 2000.0 //Hz
+var $amplitude as real = 5.0 //% max current for the RMS of the excitation
+var $pointDensity as Multisine_PointDensity = Multisine_PointDensity.Fine //determines the frequency spacing of the response
+var $numAvgs as integer = 4 //number of each disturbance array to collect to average the data
+var $outputFolder as string = "/MIMOSystemID/4Avg/" //folder to save all dat and log files to
+var $filenamePrefix as string = "FRD" //prefix to put at the beginning of the dat filenames
+
+//Other variables
+var $numDataCollections, $thisDistNumPoints, $thisNumCollectionPoints, $index as integer
+var $servoRate, $sampleTime, $transientTime as real
+var $filename as string
+
+program
+
+	ParameterSetTaskValue(TaskGetIndex(),TaskParameter.ExecuteNumLines, 200)
+
+	Enable($excitationAxis)
+	Enable($collectionAxes)
+	
+	//To run a normal response and gather the data from the excited axis/axes:
+	/*
+	Multisine_GatherFrequencyResponse($excitationAxis,$startFreq,$endFreq,$pointDensity,$amplitude,$filenamePrefix,$outputFolder)
+	ProgramExit()
+	*/
+	
+	//The following code is for custom data collection while running a multisine disturbance
+	
+	DataCollectionStop()
+	
+	//Setup the data collection ahead of time
+	//Reset the data collection configuration
+	DataCollectionReset()
+	
+	//Configure the items to collect
+	foreach var $myAxis in $collectionAxes
+		DataCollectionAddAxisSignal($myAxis,AxisDataSignal.CurrentCommand)
+		DataCollectionAddAxisSignal($myAxis,AxisDataSignal.PositionFeedback)
+	end
+	
+	//Setup the multisine disturbance in the library, this requires knowing the servo rate
+	//Get the servo rate of the axis that is going to be excited which is also the data collection rate
+	$servoRate = StatusGetAxisItem($excitationAxis, AxisDataSignal.ServoUpdateRate)*1000.0
+	$sampleTime = 1000.0/$servoRate //store the sample time in msec for the data collection rate
+	
+	//Get the number of disturbances and initialize the internal values of the library
+	$numDataCollections = Multisine_Initialize($startFreq,$endFreq,$pointDensity,$servoRate)
+	
+	//Export the information about the disturbance arrays
+	Multisine_ExportInfo($outputFolder+"Multisine_Info.csv")
+	
+	//Loop over each disturbance and collect data
+	for $index = 0 to $numDataCollections-1
+		$thisDistNumPoints = Multisine_SendDisturbance($excitationAxis,$index)
+		$thisNumCollectionPoints = $thisDistNumPoints*$numAvgs
+		
+		//Calculate time to wait between starting the excitation and starting data collection
+		//This is done by waiting for 5 periods of the lowest frequency in each disturbance rounded up to the next msec
+		//This is calculated as follows:
+		$transientTime = Ceil($thisDistNumPoints / $pointDensity * 5.0 / $servoRate * 1000.0) / 1000.0
+		if $transientTime < 0.001
+			$transientTime = 0.001
+		end
+		
+		//Set filename for data collection
+		$filename = $outputFolder+$filenamePrefix+"_"+IntegerToString($index+1)+".dat"
+		
+		//Start disturbance
+		if $amplitude*$thisMultisineAmplitudeScale > 100.0
+			TuningDisturbanceMeasurementOn($excitationAxis, TuningDisturbanceType.DriveArray, TuningMeasurementType.ServoOpenLoop, 100, 0)
+		else
+			TuningDisturbanceMeasurementOn($excitationAxis, TuningDisturbanceType.DriveArray, TuningMeasurementType.ServoOpenLoop, $amplitude*$thisMultisineAmplitudeScale, 0)
+		end
+		
+		TimerClear(0)
+			
+		//Data collection 
+	
+		//Wait for the data retrieval to be done
+		while (StatusGetSystemItem(SystemStatusItem.DataCollectionStatus) & DataCollectionFlags.UploadingDriveBuffers)
+			Dwell(0.001)
+		end
+		
+		//Make sure transient time has ellapsed
+		while TimerRead(0, TimerMode.Standard) <= $transientTime
+			Dwell(0.001)
+		end
+		
+		if $index > 0
+			DataCollectionStop()
+		end
+		
+		//Trigger the data collection
+		DataCollectionStart($filename, $thisNumCollectionPoints, $sampleTime)
+		
+		//Wait for the data collect to be done
+		while (StatusGetSystemItem(SystemStatusItem.DataCollectionStatus) & DataCollectionFlags.Triggered)
+			Dwell(0.001)
+		end
+		
+		TuningDisturbanceMeasurementOff($excitationAxis)
+	end
+	
+	//Wait for the data retrieval to be done
+	while (StatusGetSystemItem(SystemStatusItem.DataCollectionStatus) & DataCollectionFlags.UploadingDriveBuffers)
+		Dwell(0.001)
+	end
+	
+	DataCollectionStop()
+	
+	AppMessageBox("Completed","Done!",["Ok"],MessageSeverity.Information,1)
+end

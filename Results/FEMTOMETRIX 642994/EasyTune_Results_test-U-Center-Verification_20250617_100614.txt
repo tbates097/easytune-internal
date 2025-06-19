@@ -1,0 +1,102 @@
+================================================================================
+                           EASYTUNE ANALYSIS RESULTS
+================================================================================
+Generated: 2025-06-17 10:06:14
+FR File: test-U-Center-Verification.fr
+Success: YES
+Logs: C:\Users\mechassy\Desktop\EasyTune\EasyTune Logs\U_EasyTune 2025.06.17 10.06.14.zip
+================================================================================
+
+CONTROLLER PROPERTIES COMPARISON
+--------------------------------------------------
+Property                  Shaped          Original        Change    
+--------------------------------------------------
+Drive_Type                DriveType.Servo DriveType.Servo SAME      
+K                         7.243           7.327           -0.084    
+Kip                       15.000          14.730          +0.270    
+Kip2                      0.000           0.000           0.000     
+Kiv                       29.990          29.460          +0.530    
+Kpv                       1.000           1.000           0.000     
+Kv                        1.000           1.000           0.000     
+Ksi1                      0.000           0.000           0.000     
+Ksi2                      0.000           0.000           0.000     
+Servo_Filters             2               2               0         
+Servo_Loop_Gain_Normalization_Factor 2932240.114     2932240.114     0.000     
+Enhanced_Tracking_Control 0.0             0.0             0.0Hz     
+Pff                       0.000           0.000           0.000     
+Vff                       0.000           0.000           0.000     
+Aff                       0.000           0.038           -0.038    
+Jff                       0.000           0.000           0.000     
+Sff                       0.000           0.000           0.000     
+Feedforward_Advance__ms   0.495           0.490           +0.005    
+Feedforward_Filters       1               1               0         
+Feedforward_Gain_Normalization_Factor 1.000           2932240.114     -2932239.114
+Is_Dual_loop              0.000           0.000           0.000     
+Alpha                     0.000           0.000           0.000     
+Drive_Frequency__hz       10000.000       10000.000       0.000     
+Counts_Per_Unit           1000.000        22755.556       -21755.556
+
+
+DETAILED FILTER ANALYSIS
+--------------------------------------------------
+
+Servo_Filters:
+
+  Shaped Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+      Filter 1:
+        Type: Notch
+        Center Frequency: 444.399
+        Width: 218.600
+        Depth: 11.190
+
+  Original Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+      Filter 1:
+        Type: Notch
+        Center Frequency: 444.399
+        Width: 218.600
+        Depth: 11.190
+
+Feedforward_Filters:
+
+  Shaped Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+
+  Original Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+
+
+ENHANCED TRACKING ANALYSIS
+--------------------------------------------------
+Property             Setup        Bandwidth    Scale     
+--------------------------------------------------
+Shaped Enhanced_Tracking_Control:
+  Current            ETC_Setup.Disabled 0.0          0.000     
+  Original           ETC_Setup.Disabled 0.0          0.000     
+
+STABILITY ANALYSIS
+--------------------------------------------------
+Gain Margin:       12.3 dB @ 623.9 Hz
+Phase Margin:      45.8 degrees @ 84.0 Hz
+Sensitivity:       3.0 dB @ 122.2 Hz
+
+PLANT vs INVERSE FEEDFORWARD ANALYSIS
+--------------------------------------------------
+Center Frequency:           44.7 Hz
+Center Magnitude Diff:     -8.0 dB (below plant)
+Slope Difference:          -1.0 dB/decade (shallower than plant)
+Plant Slope:               -39.0 dB/decade
+Inverse FF Slope:          -40.0 dB/decade
+
+================================================================================
+                              END OF REPORT
+================================================================================

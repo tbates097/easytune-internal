@@ -1,0 +1,150 @@
+QWidget {
+    font: 12px;
+    font-family: "Barlow";
+}
+
+QMainWindow {
+    background-color: white;
+}
+
+QMenuBar {
+    background-color: @aerotech_blue;
+    color: white;
+}
+
+QToolBar {
+    background-color: white;
+    color: @aerotech_dark_gray;
+}
+
+QDockWidget {
+    color: white; /* changes the QDockWidget title color. */
+}
+
+QDockWidget::title {
+    text-align: left;
+    background: @aerotech_blue;
+}
+
+QDockWidget::close-button, QDockWidget::float-button {
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+QDockWidget::close-button:hover, QDockWidget::float-button:hover {
+    background: white;
+    color: @aerotech_light_blue;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center; /* position at the top center */
+    font: bold;
+}
+
+QHeaderView::section {
+    background-color: @aerotech_blue;
+    color: white;
+    padding-left: 4px;
+    border: 1px solid @aerotech_dark_blue;
+}
+
+QSlider::handle:horizontal {
+    background: @aerotech_light_blue;
+    border: 0px;
+    width: 18px;
+    margin: -2px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 3px;
+}
+
+QPushButton {
+    background-color: @aerotech_light_blue;
+    color: white;
+    border: none;
+    margin: 0px 2px 0px 2px;
+    padding: 2px 8px;
+}
+
+QPushButton:hover {
+    background: white;
+    color: black;
+    border: 1px solid black;
+}
+
+QToolButton {
+    margin: 2px;
+    width: 32px;
+}
+
+QLabel {
+    color: black;
+}
+
+QProgressBar {
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    height: 16px;
+}
+
+QTreeWidget::item:hover {
+    background: #efefef;
+    color: black;
+    border: 0px;
+}
+
+QTreeWidget::item:selected, QTreeWidget::item:selected:active, QTreeWidget::item:selected:!active {
+    background: @aerotech_light_blue;
+    color: white;
+    border: 0px;
+}
+
+QTabBar::tab {
+    background: @aerotech_blue;
+    border: 2px solid @aerotech_blue;
+    border-bottom-color: @aerotech_blue; /* same as the pane color */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    color: white;
+    min-width: 8ex;
+    padding: 6px 12px 6px 12px; /* top, right, bottom, left */
+}
+
+/* You can style your own custom QWidgets! Just make sure the name matches the class exactly. */
+LineEdit {
+    color: black;
+}
+
+Add_Button {
+    background: #F8D775;
+    color: black;
+    font: bold;
+    height: 12px;
+    width: 16px;
+    margin: 3px;
+    padding: 0px 0px 2px 0px;
+}
+
+Remove_Button {
+    background: red;
+    color: white;
+    font: bold;
+    height: 12px;
+    width: 16px;
+    margin: 3px;
+    padding: 0px 0px 3px 0px;
+}
+
+Flat_Header_Button {
+    background: @aerotech_blue;
+    color: white;
+    margin: -1px 0px 0px 0px; /* top, right, bottom, left */
+    padding: 4px 12px 4px 12px;
+    font: bold;
+}
+
+Property_Table_Header {
+    background: @aerotech_blue;
+    color: white;
+    padding: 2px 2px 0px 0px;
+    font: bold;
+}

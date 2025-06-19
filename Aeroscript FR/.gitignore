@@ -1,0 +1,19 @@
+## Ignore Visual Studio solution files and other python compiler files
+
+__pycache__/
+build/
+dist/
+
+.vs/
+*.pyproj
+*.sln
+
+FRD*/
+temp.ascript
+*.a1lib
+*.a1exe
+
+desktop.ini
+
+a1_file_handler.py
+

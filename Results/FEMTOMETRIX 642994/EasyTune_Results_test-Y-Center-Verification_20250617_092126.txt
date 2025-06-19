@@ -1,0 +1,152 @@
+================================================================================
+                           EASYTUNE ANALYSIS RESULTS
+================================================================================
+Generated: 2025-06-17 09:21:26
+FR File: test-Y-Center-Verification.fr
+Success: YES
+Logs: C:\Users\mechassy\Desktop\EasyTune\EasyTune Logs\Y_EasyTune 2025.06.17 09.21.25.zip
+================================================================================
+
+CONTROLLER PROPERTIES COMPARISON
+--------------------------------------------------
+Property                  Shaped          Original        Change    
+--------------------------------------------------
+Drive_Type                DriveType.Servo DriveType.Servo SAME      
+K                         8.528           9.336           -0.808    
+Kip                       7.308           7.276           +0.032    
+Kip2                      0.000           0.000           0.000     
+Kiv                       14.620          14.550          +0.070    
+Kpv                       1.000           1.000           0.000     
+Kv                        1.000           1.000           0.000     
+Ksi1                      0.000           0.000           0.000     
+Ksi2                      0.000           0.000           0.000     
+Servo_Filters             7               7               0         
+Servo_Loop_Gain_Normalization_Factor 3702000.000     3702000.000     0.000     
+Enhanced_Tracking_Control 0.0             0.0             0.0Hz     
+Pff                       0.000           0.000           0.000     
+Vff                       0.000           0.000           0.000     
+Aff                       0.000           23.077          -23.077   
+Jff                       0.000           0.000           0.000     
+Sff                       0.000           0.000           0.000     
+Feedforward_Advance__ms   1.000           1.000           0.000     
+Feedforward_Filters       1               1               0         
+Feedforward_Gain_Normalization_Factor 1.000           3702000000.000  -3701999999.000
+Is_Dual_loop              0.000           0.000           0.000     
+Alpha                     0.000           0.000           0.000     
+Drive_Frequency__hz       10000.000       10000.000       0.000     
+Counts_Per_Unit           1000.000        200000.000      -199000.000
+
+
+DETAILED FILTER ANALYSIS
+--------------------------------------------------
+
+Servo_Filters:
+
+  Shaped Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+      Filter 1:
+        Type: Notch
+        Center Frequency: 149.137
+        Width: 33.000
+        Depth: 24.200
+      Filter 2:
+        Type: Notch
+        Center Frequency: 172.660
+        Width: 31.760
+        Depth: 7.417
+      Filter 3:
+        Type: Notch
+        Center Frequency: 342.614
+        Width: 38.340
+        Depth: 9.879
+      Filter 4:
+        Type: Notch
+        Center Frequency: 493.680
+        Width: 329.500
+        Depth: 22.840
+      Filter 5:
+        Type: Notch
+        Center Frequency: 1431.230
+        Width: 867.900
+        Depth: 18.930
+      Filter 6:
+        Type: Notch
+        Center Frequency: 1842.890
+        Width: 732.400
+        Depth: 21.550
+
+  Original Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+      Filter 1:
+        Type: Notch
+        Center Frequency: 149.137
+        Width: 33.000
+        Depth: 24.200
+      Filter 2:
+        Type: Notch
+        Center Frequency: 172.660
+        Width: 31.760
+        Depth: 7.417
+      Filter 3:
+        Type: Notch
+        Center Frequency: 342.614
+        Width: 38.340
+        Depth: 9.879
+      Filter 4:
+        Type: Notch
+        Center Frequency: 493.680
+        Width: 329.500
+        Depth: 22.840
+      Filter 5:
+        Type: Notch
+        Center Frequency: 1431.230
+        Width: 867.900
+        Depth: 18.930
+      Filter 6:
+        Type: Notch
+        Center Frequency: 1842.890
+        Width: 732.400
+        Depth: 21.550
+
+Feedforward_Filters:
+
+  Shaped Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+
+  Original Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+
+
+ENHANCED TRACKING ANALYSIS
+--------------------------------------------------
+Property             Setup        Bandwidth    Scale     
+--------------------------------------------------
+Shaped Enhanced_Tracking_Control:
+  Current            ETC_Setup.Disabled 0.0          0.000     
+  Original           ETC_Setup.Disabled 0.0          0.000     
+
+STABILITY ANALYSIS
+--------------------------------------------------
+Gain Margin:       13.9 dB @ 688.0 Hz
+Phase Margin:      45.8 degrees @ 45.2 Hz
+Sensitivity:       3.1 dB @ 66.9 Hz
+
+PLANT vs INVERSE FEEDFORWARD ANALYSIS
+--------------------------------------------------
+Center Frequency:           158.7 Hz
+Center Magnitude Diff:     2.2 dB (above plant)
+Slope Difference:          -0.9 dB/decade (shallower than plant)
+Plant Slope:               -34.1 dB/decade
+Inverse FF Slope:          -35.0 dB/decade
+
+================================================================================
+                              END OF REPORT
+================================================================================

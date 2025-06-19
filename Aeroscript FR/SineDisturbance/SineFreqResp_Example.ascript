@@ -1,0 +1,5 @@
+import "SineFrequencyResponse.a1lib" as static
+
+GatherFrequencyResponse(X, 10.0, 5000.0, 250, 5.0, TuningMeasurementType.ServoOpenLoop)
+
+AppMessageDisplay("Finished!")

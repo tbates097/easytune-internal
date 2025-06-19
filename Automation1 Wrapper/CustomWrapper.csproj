@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <PackageId>$(AssemblyName)</PackageId>
+    <Product>$(AssemblyName)</Product>
+    <Authors>$(AssemblyName)</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+    <NoWarn>1701;1702;MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IsPublishable>False</IsPublishable>
+    <NoWarn>1701;1702;MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+    <NoWarn>1701;1702;MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IsPublishable>False</IsPublishable>
+    <NoWarn>1701;1702;MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Aerotech.Automation1.Applications.Controls">
+      <HintPath>..\Automation1 DLLs\Aerotech.Automation1.Applications.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Aerotech.Automation1.Applications.Core">
+      <HintPath>..\Automation1 DLLs\Aerotech.Automation1.Applications.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Aerotech.Automation1.Applications.Interfaces">
+      <HintPath>..\Automation1 DLLs\Aerotech.Automation1.Applications.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Aerotech.Automation1.Applications.Modules">
+      <HintPath>..\Automation1 DLLs\Aerotech.Automation1.Applications.Modules.dll</HintPath>
+    </Reference>
+    <Reference Include="Aerotech.Automation1.Applications.Shared">
+      <HintPath>..\Automation1 DLLs\Aerotech.Automation1.Applications.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="Aerotech.Automation1.Applications.Wpf">
+      <HintPath>..\Automation1 DLLs\Aerotech.Automation1.Applications.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Prism">
+      <HintPath>..\Automation1 DLLs\Prism.dll</HintPath>
+    </Reference>
+    <Reference Include="Prism.Unity.Wpf">
+      <HintPath>..\Automation1 DLLs\Prism.Unity.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Prism.Wpf">
+      <HintPath>..\Automation1 DLLs\Prism.Wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;../Automation1 DLLs/Aerotech.Automation1.$(ProjectName).dll&quot;" />
+  </Target>
+
+</Project>

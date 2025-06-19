@@ -1,0 +1,26 @@
+🔍 Processing FR file: test-X-NW Corner-Verification.fr
+📅 Timestamp: 2025-06-16 09:00:46
+============================================================
+
+Starting EasyTune thread...
+Reading FR file: C:\Users\MECHASSY\Documents\Automation1\test-X-NW Corner-Verification.fr
+Error during optimization: Unable to find the specified file.
+   at Aerotech.Automation1.Applications.Wpf.PlotFileXmlSerializer.ReadFrequencyResponseFile(String filePath)
+   at InvokeStub_PlotFileXmlSerializer.ReadFrequencyResponseFile(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+Traceback (most recent call last):
+  File "c:\Users\mechassy\Desktop\EasyTune\Modules\Easy_Tune_Module.py", line 651, in easy_tune_thread
+    success, block_layout_with_data, number_of_generations, optimization_time_ms = self.execute_easy_tune()
+                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\mechassy\Desktop\EasyTune\Modules\Easy_Tune_Module.py", line 288, in execute_easy_tune
+    [version, a1_data] = a1_interface.read_frequency_response_result_from_a1_file(self.fr_filepath)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\mechassy\Desktop\EasyTune\a1_interface.py", line 1016, in read_frequency_response_result_from_a1_file
+    oldest_compatible_version = PlotFileXmlSerializer.ReadFrequencyResponseFile(filepath).FileVersionInformation.get_OldestCompatibleSoftwareVersion()
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+System.IO.FileNotFoundException: Unable to find the specified file.
+   at Aerotech.Automation1.Applications.Wpf.PlotFileXmlSerializer.ReadFrequencyResponseFile(String filePath)
+   at InvokeStub_PlotFileXmlSerializer.ReadFrequencyResponseFile(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+EasyTune thread completed
+No results available for analysis

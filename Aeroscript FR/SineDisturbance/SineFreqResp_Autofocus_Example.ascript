@@ -1,0 +1,7 @@
+import "SineFrequencyResponse.a1lib" as static
+var $excitationDistance as real = 5.0  //in user units
+
+//In 2.1, the amplitude is in position command counts
+GatherFrequencyResponse(Z, 1.0, 100.0, 100, $excitationDistance * ParameterGetAxisValue(Z, AxisParameter.CountsPerUnit), TuningMeasurementType.AutoFocusOpenLoop)
+
+AppMessageDisplay("Finished!")

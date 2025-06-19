@@ -1,0 +1,61 @@
+🔍 Processing FR file: test-Y-Center-Verification.fr
+📅 Timestamp: 2025-06-16 08:59:13
+============================================================
+
+Starting EasyTune thread...
+Reading FR file: C:\Users\MECHASSY\Documents\Automation1\test-Y-Center-Verification.fr
+
+Loaded FR Data:
+Version: 2.10.1.3089
+Data type: <class 'Aerotech.Automation1.Applications.Wpf.FrequencyResponseResult'>
+Block_Layout Filename: C:\Users\MECHASSY\Documents\Automation1\test-Y-Center-Verification.fr
+Successfully created block layout
+
+Attempting EasyTune optimization...
+Best Result: Aerotech.Automation1.Applications.Interfaces.PopulationMember
+
+EasyTune Results:
+Success: False
+Generations: 295
+Time: 0.41s
+Logs: C:\Users\mechassy\Desktop\EasyTune\EasyTune Logs\Y_EasyTune 2025.06.16 08.59.24.zip
+
+Analysis complete. Results written to: C:\Users\MECHASSY\Documents\Automation1\EasyTune_Results_test-Y-Center-Verification_20250616_085927.txt
+EasyTune thread completed
+
+============================================================
+                STABILITY ANALYSIS REPORT
+============================================================
+
+🔧 FEEDFORWARD ANALYSIS:
+   Center Frequency: 158.7 Hz
+   Center Magnitude Difference: 3.049 dB
+   Slope Difference: -7.186 dB/decade
+Stability Data: {'gain_margin': {'db': 10.173824293333187, 'frequency_hz': 1031.177919447688}, 'phase_margin': {'degrees': 44.33104995513543, 'frequency_hz': 292.1865530349298}, 'sensitivity': {'db': 5.130394044860335, 'frequency_hz': 300.8255469337009}}
+
+📐 PHASE MARGIN ANALYSIS:
+   Current Value: 44.3° @ 292.2 Hz
+   Target Range:  38-52°
+   Target Value:  45°
+   ✅ PASS - Phase margin within acceptable range
+
+📊 GAIN MARGIN ANALYSIS:
+   Current Value: 10.2 dB @ 1031.2 Hz
+   Target Range:  6-15 dB
+   Target Value:  10 dB
+   ✅ PASS - Gain margin within acceptable range
+
+🎯 SENSITIVITY ANALYSIS:
+   Current Value: 5.1 dB @ 300.8 Hz
+   Maximum Limit: 6 dB
+   Target Value:  6 dB
+   ✅ PASS - Sensitivity within acceptable limit
+
+============================================================
+🎉 OVERALL ASSESSMENT: PASS
+   All stability metrics meet the required standards.
+============================================================
+
+Stability Analysis: PASSED
+🎉 OPTIMIZATION PASSED - Stability criteria met!
+✅ Process completed successfully

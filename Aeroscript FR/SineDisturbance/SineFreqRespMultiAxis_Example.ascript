@@ -1,0 +1,10 @@
+import "SineFrequencyResponse.a1lib" as static
+
+var $myAxes[8] as axis
+
+$myAxes[0] = X
+$myAxes[1] = Y
+
+GatherFrequencyResponse($myAxes, 10.0, 5000.0, 250, 5.0, TuningMeasurementType.ServoOpenLoop,20)
+
+AppMessageDisplay("Finished!")

@@ -1,0 +1,546 @@
+'Include file that contains all of the data points
+
+#include "multisine_defines.ascript" 
+//The following lines are in the above ascript
+//'Arrays were generated in python and are 131072 long
+//#define baseArrayLength 131072
+//#define thirtytwoperiodbasearrayvalues [3.871952625156201e-16,-0.0003 ... ]
+//#define sixteenperiodbasearrayvalues [-4.3649212815187716e-16,-0.0001 ... ]
+//#define eightperiodbasearrayvalues [-1.036284555129293e-16,-5.8876706 ... ]
+//#define fourperiodbasearrayvalues [-6.210502212823424e-17,-1.71483661 ... ]
+
+var $thisDriveArray[baseArrayLength+2] as real
+var $thisDriveArrayLength as integer = baseArrayLength+2
+var $baseIndex as integer = -1
+var $baseIndexStartOffset as integer = -1
+var $baseStartIndex as integer = -1
+var $numChunks as integer = -1
+
+/*! @summary Contains information for a multisine base disturbance. */
+library struct MultisineBase
+	/*! @summary Lowest frequency in the disturbance array. */
+	$startFreq as real
+	/*! @summary Highest frequency in the disturbance array. */
+	$endFreq as real
+	/*! @summary Linear spacing between frequencies in the disturbance array. */
+	$freqSpacing as real
+	/*! @summary Number of periods of the lowest frequency in the disturbance array. */
+	$numPeriods as integer
+	/*! @summary Number of points in the disturbance array. */
+	$numPoints as integer
+	/*! @summary Amplitude scale needed to change the true disturbance array to a normalized (+/- 1) value. */
+	$amplitudeScale as real
+	/*! @summary Normalized (+/- 1) disturbance array. */
+	$disturbanceArray[baseArrayLength] as real
+	/*! @summary Servo rate in Hz. */
+	$servoRate as real
+end
+
+/*! @summary Contains information of a multisine sequence. */
+library struct MultisineInfo
+/*! @summary Lowest frequency in the disturbance array. */
+	$startFreq as real
+	/*! @summary Highest frequency in the disturbance array. */
+	$endFreq as real
+	/*! @summary Linear spacing between frequencies in the disturbance array. */
+	$freqSpacing as real
+	/*! @summary Number of periods of the lowest frequency in the disturbance array. */
+	$numPeriods as integer
+	/*! @summary Number of points in the disturbance array. */
+	$numPoints as integer
+	/*! @summary Amplitude scale needed to change the true disturbance array to a normalized (+/- 1) value. */
+	$amplitudeScale as real
+	/*! @summary Servo rate in Hz. */
+	$servoRate as real
+end
+
+/*! @summary Specifies the point density of the multisine response. */
+library enum Multisine_PointDensity
+	/*! @summary Fine point density with 32 periods of the lowest frequency in each disturbance array. */
+	Fine = 32
+	/*! @summary (Default) Standard point density with 16 periods of the lowest frequency in each disturbance array. */
+	Standard = 16
+	/*! @summary Course point density with 8 periods of the lowest frequency in each disturbance array. */
+	Course = 8
+end
+
+//Initialize the base parameters with the arrays stored in the included file at the top of this file
+//The 0 values will be set during the updateServoRate function
+var $baseParameters[4] as MultisineBase = [[0,0,0,4,baseArrayLength,1.3966048288292658,fourperiodbasearrayvalues,20000],[0,0,0,8,baseArrayLength,1.3391869770830445,eightperiodbasearrayvalues,20000],[0,0,0,16,baseArrayLength,1.3512408215226546,sixteenperiodbasearrayvalues,20000],[0,0,0,32,baseArrayLength,1.3440687249422316,thirtytwoperiodbasearrayvalues,20000]]
+var $thisMultisineInfo as MultisineInfo
+
+
+/*!
+    @summary Gets the amplitude scale needed to change the true disturbance array from a normalized (+/- 1) value. 
+    @return The value required to scale the amplitude when calling TuningDisturbanceMeasurementOn.
+*/
+library property $thisMultisineAmplitudeScale as real
+	get
+		return $thisMultisineInfo.amplitudeScale
+	end
+end
+
+//--------------------------------------------------------------------------------------------------------------------------
+//Public functions
+//--------------------------------------------------------------------------------------------------------------------------
+
+/*!
+    @summary Initialize the multisine library.
+    @argument $startFreq Starting frequency [Hz].
+    @argument $endFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $servoRate Servo rate of the axis this will be executed on [Hz].
+    @return The number of disturbance arrays to cover the frequency range.
+*/
+library function Multisine_Initialize($startFreq as real, $endFreq as real, $pointDensity as Multisine_PointDensity, $servoRate as real) as integer
+	Multisine_UpdateServoRate($servoRate)
+	return initializeInternalValues($startFreq, $endFreq, $pointDensity)
+end
+
+/*!
+    @summary Initialize the multisine library for an axis with a 20kHz servo rate.
+    @argument $startFreq Starting frequency [Hz].
+    @argument $endFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+    @return The number of disturbance arrays to cover the frequency range.
+*/
+library function Multisine_Initialize($startFreq as real, $endFreq as real, $pointDensity as Multisine_PointDensity) as integer
+	return Multisine_Initialize($startFreq, $endFreq, $pointDensity, 20000.0)
+end
+
+/*!
+    @summary Updates the multisine information based upon the servo rate.
+    @argument $servoRate Servo rate in Hz.
+*/
+library function Multisine_UpdateServoRate($servoRate as real)
+	var $counter as integer
+
+	//Loop over parameters that are calculated based on the servo rate
+	for $counter = 0 to length($baseParameters)-1
+		$baseParameters[$counter].servoRate = $servoRate
+		$baseParameters[$counter].freqSpacing = $baseParameters[$counter].servoRate / $baseParameters[$counter].numPoints
+		$baseParameters[$counter].startFreq = $baseParameters[$counter].freqSpacing * $baseParameters[$counter].numPeriods
+		$baseParameters[$counter].endFreq = $baseParameters[$counter].startFreq * 2.0 - $baseParameters[$counter].freqSpacing
+	end
+end
+
+/*!
+    @summary Updates the passed structure with the information about the latest disturbance array.
+    @argument $multisineInfo Reference structure to update.
+*/
+library function Multisine_GetMultisineInfo(ref $multisineInfo as MultisineInfo)
+	$multisineInfo.startFreq = $thisMultisineInfo.startFreq
+	$multisineInfo.endFreq = $thisMultisineInfo.endFreq
+	$multisineInfo.freqSpacing = $thisMultisineInfo.freqSpacing
+	$multisineInfo.numPeriods = $thisMultisineInfo.numPeriods
+	$multisineInfo.numPoints = $thisMultisineInfo.numPoints
+	$multisineInfo.amplitudeScale = $thisMultisineInfo.amplitudeScale
+	$multisineInfo.servoRate = $thisMultisineInfo.servoRate
+end
+
+/*!
+    @summary Exports information about all of the disturbance arrays to a csv file.
+    @argument $filename Filename including the extention of the csv file. Can include path.
+*/
+library function Multisine_ExportInfo($filename as string)
+	var $fileID as handle
+	var $counter, $thisInd as integer
+	
+	$fileID = FileOpenText($filename, FileMode.Overwrite)
+	FileTextWriteString($fileID, "startFreq,endFreq,freqSpacing,numPts,numPeriods,sampleRate\n")
+	
+	for $counter = 0 to $numChunks -1
+		if $counter < ($baseIndex - $baseStartIndex)
+			$thisInd = $baseStartIndex + $counter
+			FileTextWriteString($fileID, RealToString($baseParameters[$thisInd].startFreq)+","+RealToString($baseParameters[$thisInd].endFreq)+","+RealToString($baseParameters[$thisInd].freqSpacing)+","+IntegerToString($baseParameters[$thisInd].numPoints)+","+IntegerToString($baseParameters[$thisInd].numPeriods)+","+RealToString($baseParameters[$thisInd].servoRate)+"\n")
+		else
+			$thisInd = $counter - ($baseIndex - $baseStartIndex) + $baseIndexStartOffset
+			FileTextWriteString($fileID, RealToString($baseParameters[$baseIndex].startFreq * 2.0**$thisInd)+","+RealToString($baseParameters[$baseIndex].endFreq * 2.0**$thisInd)+","+RealToString($baseParameters[$baseIndex].freqSpacing * 2.0**$thisInd)+","+IntegerToString($baseParameters[$baseIndex].numPoints / (2.0**$thisInd))+","+IntegerToString($baseParameters[$baseIndex].numPeriods)+","+RealToString($baseParameters[$baseIndex].servoRate)+"\n")
+		end	
+	end
+	
+	FileClose($fileID)
+end
+
+/*!
+    @summary Sends a disturbance array to the specified axis.
+    @argument $axis Axis to send the disturbance array.
+	@argument $index Index of the array to send.
+	@return The number points in the disturbance array.
+*/
+library function Multisine_SendDisturbance($axis as axis, $index as integer) as integer
+	var $tempAx[8] as axis
+	$tempAx[0] = $axis
+	return Multisine_SendDisturbance($tempAx, $index)
+end
+
+/*!
+    @summary Sends a disturbance array to the specified axes.
+    @argument $axes Axis array[8] to send the disturbance array.
+	@argument $index Index of the array to send.
+	@return The number points in the disturbance array.
+*/
+library function Multisine_SendDisturbance($axes[8] as axis, $index as integer) as integer
+	var $loopCounter, $thisInd, $decimationVal as integer
+	var $invalidAxis as axis
+	
+	CriticalSectionStart(500)
+	
+	if $index < ($baseIndex - $baseStartIndex)
+		//Case where a lower base numPeriods is needed to go low enough in frequency
+		$thisInd = $baseStartIndex + $index
+		$thisDriveArrayLength = $baseParameters[$thisInd].numPoints+2
+		$thisDriveArray[0] = $thisDriveArrayLength
+		$thisDriveArray[1] = 100.0
+		for $loopCounter = 2 to $thisDriveArrayLength-1
+			$thisDriveArray[$loopCounter] = $baseParameters[$thisInd].disturbanceArray[$loopCounter-2]
+		end
+		
+		//Store this info:
+		$thisMultisineInfo.startFreq = $baseParameters[$thisInd].startFreq
+		$thisMultisineInfo.endFreq = $baseParameters[$thisInd].endFreq
+		$thisMultisineInfo.freqSpacing = $baseParameters[$thisInd].freqSpacing
+		$thisMultisineInfo.numPoints = $baseParameters[$thisInd].numPoints
+		$thisMultisineInfo.numPeriods = $baseParameters[$thisInd].numPeriods
+		$thisMultisineInfo.amplitudeScale = $baseParameters[$thisInd].amplitudeScale
+		$thisMultisineInfo.servoRate = $baseParameters[$thisInd].servoRate
+	else
+		//Case where the base is used and decimation may be required
+		$decimationVal = (2.0**($index - ($baseIndex - $baseStartIndex) + $baseIndexStartOffset))
+		$thisDriveArrayLength = $baseParameters[$baseIndex].numPoints / $decimationVal + 2
+		$thisDriveArray[0] = $thisDriveArrayLength
+		$thisDriveArray[1] = 100
+		
+		$loopCounter = 2
+		for $thisInd = 0 to baseArrayLength-1 step $decimationVal
+			$thisDriveArray[$loopCounter] = $baseParameters[$baseIndex].disturbanceArray[$thisInd]
+			$loopCounter++
+		end
+		
+		//Calculate and store this info:
+		$thisMultisineInfo.startFreq = $baseParameters[$baseIndex].startFreq*$decimationVal
+		$thisMultisineInfo.endFreq = $baseParameters[$baseIndex].endFreq*$decimationVal
+		$thisMultisineInfo.freqSpacing = $baseParameters[$baseIndex].freqSpacing*$decimationVal
+		$thisMultisineInfo.numPoints = $baseParameters[$baseIndex].numPoints/$decimationVal
+		$thisMultisineInfo.numPeriods = $baseParameters[$baseIndex].numPeriods
+		$thisMultisineInfo.amplitudeScale = $baseParameters[$baseIndex].amplitudeScale
+		$thisMultisineInfo.servoRate = $baseParameters[$baseIndex].servoRate
+	end	
+		
+	foreach var $myAxis in $axes
+		if $myAxis == $invalidAxis
+			continue
+		end
+		DriveArrayWrite($myAxis, $thisDriveArray, 0, $thisDriveArrayLength, DriveArrayType.Float32)
+	end
+	
+	CriticalSectionEnd()
+	return $thisDriveArrayLength-2
+end
+
+/*!
+    @summary Collects a multisine frequency response and stores data in "/FRD/".
+    @argument $myAxis Axis to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+*/
+library function Multisine_GatherFrequencyResponse($myAxis as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real)
+	Multisine_GatherFrequencyResponse($myAxis, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, 1, "FRD", "/FRD/")
+end
+
+/*!
+    @summary Collects a multisine frequency response.
+    @argument $myAxis Axis to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+	@argument $filePrefix Text to put at the beginning of the data collection filenames.
+	@argument $outputLocation Location to save all information.
+*/
+library function Multisine_GatherFrequencyResponse($myAxis as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real, $filePrefix as string, $outputLocation as string)
+	Multisine_GatherFrequencyResponse($myAxis, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, 1, $filePrefix, $outputLocation)
+end
+
+/*!
+    @summary Collects a multisine frequency response and stores data in "/FRD/" with averages.
+    @argument $myAxis Axis to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+	@argument $numAvgs Number of each disturbance array to collect.
+*/
+library function Multisine_GatherFrequencyResponse($myAxis as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real, $numAvgs as integer)
+	Multisine_GatherFrequencyResponse($myAxis, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, $numAvgs, "FRD", "/FRD/")
+end
+
+/*!
+    @summary Collects a multisine frequency response with averages.
+    @argument $myAxis Axis to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+	@argument $numAvgs Number of each disturbance array to collect.
+	@argument $filePrefix Text to put at the beginning of the data collection filenames.
+	@argument $outputLocation Location to save all information.
+*/
+library function Multisine_GatherFrequencyResponse($myAxis as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real, $numAvgs as integer, $filePrefix as string, $outputLocation as string)
+	var $tempAx[8] as axis
+	$tempAx[0] = $myAxis
+	Multisine_GatherFrequencyResponse($tempAx, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, $numAvgs, $filePrefix, $outputLocation)
+end
+
+/*!
+    @summary Collects a multisine frequency response and stores data in "/FRD/" of multiple axes simultaneously.
+    @argument $myAxes Axis array[8] to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+*/
+library function Multisine_GatherFrequencyResponse($myAxes[8] as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real)
+	Multisine_GatherFrequencyResponse($myAxes, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, 1, "FRD", "/FRD/")
+end
+
+/*!
+    @summary Collects a multisine frequency response of multiple axes simultaneously.
+    @argument $myAxes Axis array[8] to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+	@argument $filePrefix Text to put at the beginning of the data collection filenames.
+	@argument $outputLocation Location to save all information.
+*/
+library function Multisine_GatherFrequencyResponse($myAxes[8] as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real, $filePrefix as string, $outputLocation as string)
+	Multisine_GatherFrequencyResponse($myAxes, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, 1, $filePrefix, $outputLocation)
+end
+
+/*!
+    @summary Collects a multisine frequency response and stores data in "/FRD/" of multiple axes simultaneously with averages.
+    @argument $myAxes Axis array[8] to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+	@argument $numAvgs Number of each disturbance array to collect.
+*/
+library function Multisine_GatherFrequencyResponse($myAxes[8] as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real, $numAvgs as integer)
+	Multisine_GatherFrequencyResponse($myAxes, $minFreq, $maxFreq, $pointDensity, $excitationAmplitude, $numAvgs, "FRD", "/FRD/")
+end
+
+/*!
+    @summary Collects a multisine frequency response of multiple axes simultaneously with averages.
+    @argument $myAxes Axis array[8] to excite and collect data from.
+	@argument $minFreq Starting frequency [Hz].
+	@argument $maxFreq Ending frequency [Hz].
+	@argument $pointDensity Point density of the multisine.
+	@argument $excitationAmplitude Percentage of the max current for the RMS of the excitation.
+	@argument $numAvgs Number of each disturbance array to collect.
+	@argument $filePrefix Text to put at the beginning of the data collection filenames.
+	@argument $outputLocation Location to save all information.
+*/
+library function Multisine_GatherFrequencyResponse($myAxes[8] as axis, $minFreq as real, $maxFreq as real, $pointDensity as Multisine_PointDensity, $excitationAmplitude as real, $numAvgs as integer, $filePrefix as string, $outputLocation as string)
+	var $thisTransientTime, $servoRate, $sampleTime, $temp as real
+	var $numSamples, $numDisturbances, $loopCounter as integer
+	var $filename as string
+	var $fileLog as handle
+	var $invalidAxis as axis
+	
+	DataCollectionStop()
+	ParameterSetTaskValue(TaskGetIndex(),TaskParameter.ExecuteNumLines, 200)
+	
+	//Setup the data collection ahead of time:
+
+	//Reset the data collection configuration.
+	DataCollectionReset()
+
+	//Configure the items needed
+	DataCollectionAddSystemSignal(SystemDataSignal.DataCollectionSampleTime)
+	foreach var $myAxis in $myAxes
+		if $myAxis == $invalidAxis
+			continue
+		end
+		DataCollectionAddAxisSignal($myAxis,AxisDataSignal.FrequencyResponseBefore)
+		DataCollectionAddAxisSignal($myAxis,AxisDataSignal.FrequencyResponseAfter)
+	end
+	
+	//All axes must be the same servo rate for the multisine diturbances to be the same on all axes
+	$servoRate = 10000000.0
+	foreach var $myAxis in $myAxes
+		if $myAxis == $invalidAxis
+			continue
+		end
+		$temp = StatusGetAxisItem($myAxis, AxisDataSignal.ServoUpdateRate)*1000
+		if $servoRate == 10000000.0
+			$servoRate = $temp
+		elseif $temp != $servoRate
+			AppMessageBox("Error", "All axes must have the same servo rate!",["Ok"],MessageSeverity.Error, 1)
+			return
+		end
+	end
+	
+	$sampleTime = 1000.0/$servoRate
+	
+	//Create a file to document the inputs to the function in a text format
+	$fileLog = FileOpenText($outputLocation+$filePrefix+"_RunInfo.txt", FileMode.Overwrite)
+	foreach var $myAxis in $myAxes
+		if $myAxis == $invalidAxis
+			continue
+		end
+		FileTextWriteString($fileLog,"Axis: "+AxisToString($myAxis)+"\n")
+	end
+	FileTextWriteString($fileLog,"StartFreq: "+RealToString($minFreq)+"\n")
+	FileTextWriteString($fileLog,"EndFreq: "+RealToString($maxFreq)+"\n")
+	FileTextWriteString($fileLog,"NumPeriods: "+IntegerToString($pointDensity)+"\n")
+	FileTextWriteString($fileLog,"Amplitude: "+RealToString($excitationAmplitude)+"\n")
+	FileTextWriteString($fileLog,"NumAvgs: "+IntegerToString($numAvgs)+"\n")
+	FileClose($fileLog)
+	
+	//Get the number of disturbance and initialize the internal values
+	$numDisturbances = Multisine_Initialize($minFreq, $maxFreq, $pointDensity, $servoRate)
+	
+	//Create a file to log all of the information about each disturbance and collected dat file
+	$fileLog = FileOpenText($outputLocation+$filePrefix+"_FileLog.csv", FileMode.Overwrite)
+	FileTextWriteString($fileLog, "filename,startFreq,endFreq,freqSpacing,numPts,numPeriods,numCollectedPts,sampleRate\n")
+	
+	//Loop over all of the disturbances
+	for $loopCounter = 0 to $numDisturbances-1
+	
+		//Get the number of samples for this disturbance and send the disturbance to all drives
+		$numSamples = Multisine_SendDisturbance($myAxes, $loopCounter)
+
+		//Multiply the number of samples by the number of desired averages to get the total number of points
+		$numSamples *= $numAvgs
+		
+		//Set filename for data collection
+		$filename = $outputLocation+$filePrefix+"_"+IntegerToString($loopCounter+1)+".dat"
+		
+		//Log info
+		FileTextWriteString($fileLog, $filename+","+RealToString($thisMultisineInfo.startFreq)+","+RealToString($thisMultisineInfo.endFreq)+","+RealToString($thisMultisineInfo.freqSpacing)+","+IntegerToString($thisMultisineInfo.numPoints)+","+IntegerToString($thisMultisineInfo.numPeriods)+","+IntegerToString($numSamples)+","+RealToString($thisMultisineInfo.servoRate)+"\n")
+		
+		//Calculate the transient time for this chunk
+		if $thisMultisineInfo.startFreq > 5000.0
+			$thisTransientTime = 0.001
+		else
+			$thisTransientTime = Round(5000/$thisMultisineInfo.startFreq) / 1000.0
+		end
+		
+		foreach var $myAxis in $myAxes
+			if $myAxis == $invalidAxis
+				continue
+			end
+			
+			if $excitationAmplitude*$thisMultisineInfo.amplitudeScale > 100.0
+				TuningDisturbanceMeasurementOn($myAxis, TuningDisturbanceType.DriveArray, TuningMeasurementType.ServoOpenLoop, 100, 0)
+			else
+				TuningDisturbanceMeasurementOn($myAxis, TuningDisturbanceType.DriveArray, TuningMeasurementType.ServoOpenLoop, $excitationAmplitude*$thisMultisineInfo.amplitudeScale, 0)
+			end
+		end
+		
+		TimerClear(0)
+		
+		//Data collection 
+
+		//Wait for the data retrieval to be done
+		while (StatusGetSystemItem(SystemStatusItem.DataCollectionStatus) & DataCollectionFlags.UploadingDriveBuffers)
+			Dwell(0.001)
+		end
+		
+		//Make sure transient time has ellapsed
+		while TimerRead(0, TimerMode.Standard) <= $thisTransientTime
+			Dwell(0.001)
+		end
+		
+		if $loopCounter > 0
+			DataCollectionStop()
+		end
+		
+		//Trigger the data collection
+		DataCollectionStart($filename, $numSamples, $sampleTime)
+		
+		//Wait for the data collect to be done
+		while (StatusGetSystemItem(SystemStatusItem.DataCollectionStatus) & DataCollectionFlags.Triggered)
+			Dwell(0.001)
+		end
+		
+		foreach var $myAxis in $myAxes
+			if $myAxis == $invalidAxis
+				continue
+			end
+			TuningDisturbanceMeasurementOff($myAxis)
+		end
+		
+	end
+	
+	FileClose($fileLog)
+
+	foreach var $myAxis in $myAxes
+		if $myAxis == $invalidAxis
+			continue
+		end
+		TuningDisturbanceMeasurementOff($myAxis)
+	end
+
+	//Wait for the data retrieval to be done
+	while (StatusGetSystemItem(SystemStatusItem.DataCollectionStatus) & DataCollectionFlags.UploadingDriveBuffers)
+		Dwell(0.001)
+	end
+
+	DataCollectionStop()
+	
+end
+
+//--------------------------------------------------------------------------------------------------------------------------
+//Private functions
+//--------------------------------------------------------------------------------------------------------------------------
+
+function initializeInternalValues($startFreq as real, $endFreq as real, $numPeriods as integer) as integer
+	var $thisStartFreq as real = $startFreq
+	var $thisEndFreq as real = $endFreq
+	
+	if $startFreq < ($baseParameters[0].startFreq)
+		AppMessageBox("Invalid Start Frequency", "Start frequency must be >= "  + RealToString($baseParameters[0].startFreq,RealDisplayFormat.Compact)+".\nUsing this value instead.",["Ok"],MessageSeverity.Error, 1)
+		$thisStartFreq = $baseParameters[0].startFreq
+	end
+	
+	if $endFreq > ($baseParameters[0].servoRate/2.0)
+		AppMessageBox("Invalid End Frequency", "End frequency must be <= " + RealToString(($baseParameters[0].servoRate/2.0),RealDisplayFormat.Compact)+" (Nyquist).\nSetting end frequency to Nyquist.",["Ok"],MessageSeverity.Error, 1)		
+		$thisEndFreq = $baseParameters[0].servoRate/2.0
+	end
+	
+	$baseIndex = numPeriodsToIndex($numPeriods)
+	$baseIndexStartOffset = 0
+	$baseStartIndex = $baseIndex
+	$numChunks = Ceil(Log2($thisEndFreq / $baseParameters[$baseIndex].startFreq)) - Floor(Log2($thisStartFreq / $baseParameters[$baseIndex].startFreq))
+	
+	//Find which base to start with if the start frequency is below the lowest frequency on this numPeriods
+	if $baseParameters[$baseIndex].startFreq > $thisStartFreq
+		$baseStartIndex += Floor(Log2($thisStartFreq / $baseParameters[$baseIndex].startFreq)) //the value of the Log2 will always be negative 
+	else
+	//See the first decimation required, if any
+		$baseIndexStartOffset = Floor(Log2($thisStartFreq/$baseParameters[$baseIndex].startFreq))
+	end
+	
+	return $numChunks
+end
+
+function numPeriodsToIndex($numPeriods as integer) as integer
+	var $tempStr as string = "["
+	var $counter as integer
+	
+	for $counter = 0 to length($baseParameters)-1
+		if $baseParameters[$counter].numPeriods == $numPeriods
+			return $counter
+		end
+		$tempStr += IntegerToString($baseParameters[$counter].numPeriods) + " "
+	end
+	$tempStr = StringSubstring($tempStr,0,StringLength($tempStr)-1) + "]"
+	AppMessageBox("Invalid Number of Periods", "Number of periods must be one of these values: " +$tempStr+".",["Ok"],MessageSeverity.Error, 1)
+	ProgramExit()
+	return -1
+end

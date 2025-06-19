@@ -1,0 +1,209 @@
+🔍 Processing FR file: test-X-Center.fr
+📅 Timestamp: 2025-06-12 14:36:12
+============================================================
+
+🎯 STEP 2: EasyTune Optimization
+
+Starting EasyTune thread...
+Reading FR file: C:\Users\MECHASSY\Documents\Automation1\test-X-Center.fr
+
+Loaded FR Data:
+Version: 2.10.0.3041
+Data type: <class 'Aerotech.Automation1.Applications.Wpf.FrequencyResponseResult'>
+Block_Layout Filename: C:\Users\MECHASSY\Documents\Automation1\test-X-Center.fr
+Successfully created block layout
+
+Attempting EasyTune optimization...
+Open loop response: Aerotech.Automation1.Applications.Shared.FrequencyResponse
+Created FrequencyResponseAnalyzer from open loop response: Aerotech.Automation1.Applications.Shared.FrequencyResponseAnalyzer
+
+EasyTune Results:
+Success: True
+Generations: 121
+Time: 0.55s
+Logs: C:\Users\mechassy\Desktop\EasyTune\EasyTune Logs\X_EasyTune 2025.06.12 14.36.24.zip
+
+Analysis complete. Results written to: C:\Users\MECHASSY\Documents\Automation1\EasyTune_Results_test-X-Center_20250612_143625.txt
+EasyTune thread completed
+
+============================================================
+                STABILITY ANALYSIS REPORT
+============================================================
+
+🔧 FEEDFORWARD ANALYSIS:
+   Center Frequency: 158.7 Hz
+   Center Magnitude Difference: 0.017 dB
+   Slope Difference: -7.717 dB/decade
+
+📐 PHASE MARGIN ANALYSIS:
+   Current Value: 55.9° @ 27.6 Hz
+   Target Range:  38-52°
+   Target Value:  45°
+   ⚠️  WARNING - Phase margin too high (maximum: 52°)
+
+📊 GAIN MARGIN ANALYSIS:
+   Current Value: 15.5 dB @ 394.9 Hz
+   Target Range:  6-15 dB
+   Target Value:  10 dB
+   ⚠️  WARNING - Gain margin too high (maximum: 15 dB)
+
+🎯 SENSITIVITY ANALYSIS:
+   Current Value: 3.4 dB @ 40.0 Hz
+   Maximum Limit: 6 dB
+   Target Value:  6 dB
+   ✅ PASS - Sensitivity within acceptable limit
+
+============================================================
+⚠️  OVERALL ASSESSMENT: FAIL
+   The following issues were identified:
+   1. Phase margin too high (55.9° > 52°)
+   2. Gain margin too high (15.5 dB > 15 dB)
+============================================================
+
+Stability Analysis: FAILED
+Applying new servo parameters for axis X
+Gain K Before: 2.478
+Gain K Shaped: 2.457
+Kip Before: 3.474
+Kip Shaped: 2.739
+Kip2 Before: 0.0
+Kip2 Shaped: 0.0
+Kiv Before: 6.948
+Kiv Shaped: 5.479
+Kpv Before: 1.0
+Kpv Shaped: 1.0
+Kv Before: 1.0
+Kv Shaped: 1.0
+Ksi1 Before: 0.0
+Ksi1 Shaped: 0.0
+Ksi2 Before: 0.0
+Ksi2 Shaped: 0.0
+Pff Before: 0.0
+Pff Shaped: 0.0
+Vff Before: 0.0
+Vff Shaped: 0.0
+🔧 FF ANALYSIS ADJUSTMENT:
+   Aff Original: 7.018146
+   Center Mag Diff: +0.017208 dB
+   Aff Adjusted: 7.035354
+Jff Before: 0.0
+Jff Shaped: 0.0
+Sff Before: 0.0
+Sff Shaped: 0.0
+Feedforward Advance Before: 0.38966843485832214
+Feedforward Advance Shaped: 0.39110120646046137
+✅ Successfully applied shaped servo parameters
+
+📋 PARAMETER UPDATE SUMMARY:
+   Axis: X
+   Parameters Applied: 17
+
+🔧 Processing shaped filter configurations...
+🔧 Using Drive Frequency as sample frequency: 20000.0 Hz
+
+Processing Servo_Filters Filter 0: Low_Pass
+Parameters: {'Cutoff Frequency': 1000.0000000000002}
+  Cutoff Frequency: 1000.000 Hz
+  Numerator:   [0.019790, 0.039579, 0.019790]
+  Denominator: [1.000000, -1.564504, 0.643662]
+
+Processing Servo_Filters Filter 1: Notch
+Parameters: {'Center Frequency': 750.0001689591195, 'Width': 150.00009224741342, 'Depth': 12.00000161701158}
+  Center Frequency: 750.000 Hz
+  Width: 150.000
+  Depth: 12.000 dB
+  Numerator:   [0.981924, -1.897795, 0.969797]
+  Denominator: [1.000000, -1.897795, 0.951721]
+
+Processing Servo_Filters Filter 2: Notch
+Parameters: {'Center Frequency': 98.88679904508707, 'Width': 126.29925901359243, 'Depth': 21.6900858192255}
+  Center Frequency: 98.887 Hz
+  Width: 126.299
+  Depth: 21.690 dB
+  Numerator:   [0.984269, -1.964767, 0.981447]
+  Denominator: [1.000000, -1.964767, 0.965716]
+
+Processing Servo_Filters Filter 3: Notch
+Parameters: {'Center Frequency': 167.9243337214551, 'Width': 36.21995539422956, 'Depth': 4.180998753623233}
+  Center Frequency: 167.924 Hz
+  Width: 36.220
+  Depth: 4.181 dB
+  Numerator:   [0.995608, -1.974258, 0.981400]
+  Denominator: [1.000000, -1.974258, 0.977008]
+
+Processing Servo_Filters Filter 4: Notch
+Parameters: {'Center Frequency': 415.32412190171203, 'Width': 232.99997165653468, 'Depth': 29.99995628938136}
+  Center Frequency: 415.324 Hz
+  Width: 233.000
+  Depth: 30.000 dB
+  Numerator:   [0.967058, -1.915542, 0.964906]
+  Denominator: [1.000000, -1.915542, 0.931964]
+
+Processing Servo_Filters Filter 5: Notch
+Parameters: {'Center Frequency': 860.0657729674774, 'Width': 1712.0001022163688, 'Depth': 19.80000734250593}
+  Center Frequency: 860.066 Hz
+  Width: 1712.000
+  Depth: 19.800 dB
+  Numerator:   [0.843953, -1.592379, 0.808376]
+  Denominator: [1.000000, -1.592379, 0.652329]
+
+Processing Servo_Filters Filter 6: Notch
+Parameters: {'Center Frequency': 1798.3399854886925, 'Width': 391.40007065323783, 'Depth': 14.800013035579143}
+  Center Frequency: 1798.340 Hz
+  Width: 391.400
+  Depth: 14.800 dB
+  Numerator:   [0.954894, -1.596071, 0.934826]
+  Denominator: [1.000000, -1.596071, 0.889720]
+
+Processing Feedforward_Filters Filter 0: Low_Pass
+Parameters: {'Cutoff Frequency': 999.9998359965327}
+  Cutoff Frequency: 1000.000 Hz
+  Numerator:   [0.019790, 0.039579, 0.019790]
+  Denominator: [1.000000, -1.564504, 0.643662]
+
+Applying Servo_Filters coefficients to axis X
+  Applying Filter 0 (Low_Pass):
+    Numerator:   [0.019790, 0.039579, 0.019790]
+    Denominator: [1.000000, -1.564504, 0.643662]
+    ✅ Applied to ServoLoopFilter00
+  Applying Filter 1 (Notch):
+    Numerator:   [0.981924, -1.897795, 0.969797]
+    Denominator: [1.000000, -1.897795, 0.951721]
+    ✅ Applied to ServoLoopFilter01
+  Applying Filter 2 (Notch):
+    Numerator:   [0.984269, -1.964767, 0.981447]
+    Denominator: [1.000000, -1.964767, 0.965716]
+    ✅ Applied to ServoLoopFilter02
+  Applying Filter 3 (Notch):
+    Numerator:   [0.995608, -1.974258, 0.981400]
+    Denominator: [1.000000, -1.974258, 0.977008]
+    ✅ Applied to ServoLoopFilter03
+  Applying Filter 4 (Notch):
+    Numerator:   [0.967058, -1.915542, 0.964906]
+    Denominator: [1.000000, -1.915542, 0.931964]
+    ✅ Applied to ServoLoopFilter04
+  Applying Filter 5 (Notch):
+    Numerator:   [0.843953, -1.592379, 0.808376]
+    Denominator: [1.000000, -1.592379, 0.652329]
+    ✅ Applied to ServoLoopFilter05
+  Applying Filter 6 (Notch):
+    Numerator:   [0.954894, -1.596071, 0.934826]
+    Denominator: [1.000000, -1.596071, 0.889720]
+    ✅ Applied to ServoLoopFilter06
+
+Applying Feedforward_Filters coefficients to axis X
+  Applying Filter 0 (Low_Pass):
+    Numerator:   [0.019790, 0.039579, 0.019790]
+    Denominator: [1.000000, -1.564504, 0.643662]
+    ✅ Applied to FeedforwardFilter00
+
+🔧 Enabling servo filters at indices: [0, 1, 2, 3, 4, 5, 6]
+  Adding filter 0 to bitmask: bit 0 = 1
+  Adding filter 1 to bitmask: bit 1 = 2
+  Adding filter 2 to bitmask: bit 2 = 4
+  Adding filter 3 to bitmask: bit 3 = 8
+  Adding filter 4 to bitmask: bit 4 = 16
+  Adding filter 5 to bitmask: bit 5 = 32
+  Adding filter 6 to bitmask: bit 6 = 64
+🔧 Final servoloopfiltersetup bitmask: 127 (binary: 0b1111111)
+✅ Successfully applied all filter coefficients

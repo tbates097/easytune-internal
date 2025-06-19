@@ -1,0 +1,182 @@
+================================================================================
+                           EASYTUNE ANALYSIS RESULTS
+================================================================================
+Generated: 2025-06-16 08:59:39
+FR File: test-X-Center-Verification.fr
+Success: YES
+Logs: C:\Users\mechassy\Desktop\EasyTune\EasyTune Logs\X_EasyTune 2025.06.16 08.59.37.zip
+================================================================================
+
+CONTROLLER PROPERTIES COMPARISON
+--------------------------------------------------
+Property                  Shaped          Original        Change    
+--------------------------------------------------
+Drive_Type                DriveType.Servo DriveType.Servo SAME      
+K                         2.470           2.432           +0.038    
+Kip                       3.308           4.278           -0.970    
+Kip2                      0.000           0.000           0.000     
+Kiv                       6.616           8.555           -1.939    
+Kpv                       1.000           1.000           0.000     
+Kv                        1.000           1.000           0.000     
+Ksi1                      0.000           0.000           0.000     
+Ksi2                      0.000           0.000           0.000     
+Servo_Filters             10              10              0         
+Servo_Loop_Gain_Normalization_Factor 18510000.000    18510000.000    0.000     
+Enhanced_Tracking_Control 0.0             0.0             0.0Hz     
+Pff                       0.000           0.000           0.000     
+Vff                       0.000           0.000           0.000     
+Aff                       0.000           7.552           -7.552    
+Jff                       0.000           0.000           0.000     
+Sff                       0.000           0.000           0.000     
+Feedforward_Advance__ms   0.342           0.339           +0.003    
+Feedforward_Filters       1               1               0         
+Feedforward_Gain_Normalization_Factor 1.000           18510000000.000 -18509999999.000
+Is_Dual_loop              0.000           0.000           0.000     
+Alpha                     0.000           0.000           0.000     
+Drive_Frequency__hz       20000.000       20000.000       0.000     
+Counts_Per_Unit           1000.000        1000000.000     -999000.000
+
+
+DETAILED FILTER ANALYSIS
+--------------------------------------------------
+
+Servo_Filters:
+
+  Shaped Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 750.000
+      Filter 1:
+        Type: Notch
+        Center Frequency: 998.000
+        Width: 350.000
+        Depth: 15.000
+      Filter 2:
+        Type: Notch
+        Center Frequency: 575.000
+        Width: 87.000
+        Depth: 5.000
+      Filter 3:
+        Type: Notch
+        Center Frequency: 152.998
+        Width: 250.001
+        Depth: 10.000
+      Filter 4:
+        Type: Notch
+        Center Frequency: 739.000
+        Width: 180.000
+        Depth: 10.000
+      Filter 5:
+        Type: Notch
+        Center Frequency: 99.956
+        Width: 45.970
+        Depth: 17.840
+      Filter 6:
+        Type: Notch
+        Center Frequency: 417.573
+        Width: 200.800
+        Depth: 10.940
+      Filter 7:
+        Type: Notch
+        Center Frequency: 701.935
+        Width: 749.200
+        Depth: 14.860
+      Filter 8:
+        Type: Notch
+        Center Frequency: 521.667
+        Width: 77.340
+        Depth: 13.770
+      Filter 9:
+        Type: Notch
+        Center Frequency: 1351.210
+        Width: 752.200
+        Depth: 30.000
+
+  Original Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 750.000
+      Filter 1:
+        Type: Notch
+        Center Frequency: 998.000
+        Width: 350.000
+        Depth: 15.000
+      Filter 2:
+        Type: Notch
+        Center Frequency: 575.000
+        Width: 87.000
+        Depth: 5.000
+      Filter 3:
+        Type: Notch
+        Center Frequency: 152.998
+        Width: 250.001
+        Depth: 10.000
+      Filter 4:
+        Type: Notch
+        Center Frequency: 739.000
+        Width: 180.000
+        Depth: 10.000
+      Filter 5:
+        Type: Notch
+        Center Frequency: 99.956
+        Width: 45.970
+        Depth: 17.840
+      Filter 6:
+        Type: Notch
+        Center Frequency: 417.573
+        Width: 200.800
+        Depth: 10.940
+      Filter 7:
+        Type: Notch
+        Center Frequency: 701.935
+        Width: 749.200
+        Depth: 14.860
+      Filter 8:
+        Type: Notch
+        Center Frequency: 521.667
+        Width: 77.340
+        Depth: 13.770
+      Filter 9:
+        Type: Notch
+        Center Frequency: 1351.210
+        Width: 752.200
+        Depth: 30.000
+
+Feedforward_Filters:
+
+  Shaped Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+
+  Original Configuration:
+      Filter 0:
+        Type: Low_Pass
+        Cutoff Frequency: 1000.000
+
+
+ENHANCED TRACKING ANALYSIS
+--------------------------------------------------
+Property             Setup        Bandwidth    Scale     
+--------------------------------------------------
+Shaped Enhanced_Tracking_Control:
+  Current            ETC_Setup.Disabled 0.0          0.000     
+  Original           ETC_Setup.Disabled 0.0          0.000     
+
+STABILITY ANALYSIS
+--------------------------------------------------
+Gain Margin:       13.6 dB @ 478.4 Hz
+Phase Margin:      49.6 degrees @ 28.7 Hz
+Sensitivity:       3.4 dB @ 37.0 Hz
+
+PLANT vs INVERSE FEEDFORWARD ANALYSIS
+--------------------------------------------------
+Center Frequency:           158.7 Hz
+Center Magnitude Diff:     -0.6 dB (below plant)
+Slope Difference:          -7.1 dB/decade (shallower than plant)
+Plant Slope:               -29.0 dB/decade
+Inverse FF Slope:          -36.2 dB/decade
+
+================================================================================
+                              END OF REPORT
+================================================================================
