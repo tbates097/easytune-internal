@@ -26,6 +26,7 @@ import shutil
 
 from Modules.Easy_Tune_Module import Easy_Tune_Module
 from Modules.Easy_Tune_Plotter import EasyTunePlotter
+from Modules.EncoderTuning import EncoderTuning
 
 global so_dir
 so_dir = None
@@ -95,11 +96,25 @@ def modify_mcd_enabled_tasks():
             
             # Check if EnabledTasks already exists
             enabled_tasks = system.find('.//P[@n="EnabledTasks"]')
-            if enabled_tasks is None or system.text == "":
-                # Add EnabledTasks parameter
+            needs_update = False
+
+            if enabled_tasks is None:
+                # Add EnabledTasks parameter if it doesn't exist
                 enabled_tasks = ET.SubElement(system, "P")
                 enabled_tasks.set("id", "278")
                 enabled_tasks.set("n", "EnabledTasks")
+                needs_update = True
+            else:
+                # Check if the value is missing or <= 2
+                try:
+                    value = int(enabled_tasks.text.strip())
+                    if value <= 2:
+                        needs_update = True
+                except (TypeError, ValueError, AttributeError):
+                    # If text is missing or not an integer, update it
+                    needs_update = True
+
+            if needs_update:
                 enabled_tasks.text = "3"
                 
                 # Save the modified Parameters file with proper XML declaration
@@ -1783,7 +1798,7 @@ def init_fr(all_axes=None, test_type=None, axes=None, controller=None, init_curr
     if test_type == 'single':
         axes_dict = {}
         # Ask user which axis to perform EasyTune on
-        axis = axes
+        axis = axes[0]
         if not axis:
             print("❌ No axis specified. Exiting...")
             return
@@ -2025,11 +2040,39 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
         print("🚀 Starting Complete EasyTune Process with Verification")
         print("="*60)
 
+        # Set a condition that ensures currents are below average current threshold
+        current_thresholds = {}
+        for axis in axes:
+            current_thresholds[axis] = {}
+            current_thresholds[axis]['average'] = controller.runtime.parameters.axes[axis].protection.averagecurrentthreshold.value
+            current_thresholds[axis]['max'] = controller.runtime.parameters.axes[axis].protection.maxcurrentclamp.value
+
         init_current = 5
         ver_current = 10
         
-        
-        
+        # Check init and ver currents agains thresholds
+        for axis in axes:
+            init_current_amp = current_thresholds[axis]['max'] * (init_current / 100)
+            ver_current_amp = current_thresholds[axis]['max'] * (ver_current / 100)
+            if init_current_amp > (current_thresholds[axis]['average'] / 2):
+                new_init_current = (0.5 * current_thresholds[axis]['average']) / current_thresholds[axis]['max'] * 100
+                print(f"⚠️ Initial current {init_current} exceeds average current threshold for axis {axis}. Adjusting to {new_init_current:.2f}% of max current.")
+                init_current = new_init_current
+            if ver_current_amp > (current_thresholds[axis]['average'] / 2):
+                new_ver_current = (0.5 * current_thresholds[axis]['average']) / current_thresholds[axis]['max'] * 100
+                print(f"⚠️ Verification current {ver_current} exceeds average current threshold for axis {axis}. Adjusting to {new_ver_current:.2f}% of max current.")
+                ver_current = new_ver_current
+
+        # Set position error to 10x for axes being tuned
+        current_pos_error = {}
+        config_params = controller.configuration.parameters.get_configuration()
+        for axis in axes:
+            current_pos_error[axis] = {}
+            pos_error = controller.runtime.parameters.axes[axis].protection.positionerrorthreshold.value
+            current_pos_error[axis] = pos_error
+            config_params.axes[axis].protection.positionerrorthreshold.value = pos_error * 10
+        controller.reset()
+
         log_files, axes_dict, axis_limits = init_fr(all_axes=all_axes, test_type=test_type, axes=axes, controller=controller, init_current=init_current)
         
         ver_failed = verify_fr(all_axes=all_axes, test_type=test_type, axes=axes, controller=controller, log_files=log_files, axes_dict=axes_dict, axis_limits=axis_limits, ver_current=ver_current)
@@ -2047,13 +2090,24 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
             print("\n❌ Maximum verification attempts reached without success")
         else:
             print("\n✅ Verification completed successfully")
-            
+    
+    # Set position error back to original value
+    config_params = controller.configuration.parameters.get_configuration()
+    for axis in axes:
+        config_params.axes[axis].protection.positionerrorthreshold.value = current_pos_error[axis]
+    controller.reset()
+
     if test == 'validate':
         validate_stage_performance(controller=controller, axes_dict=axes_dict, test_type=test_type, axis_limits=axis_limits, all_axes=all_axes)
 
 if __name__ == "__main__":
     controller, axes = connect()
     print(f"Available axes: {axes}")
+
+    # Ask user to specify axes they would like enabled during tuning
+    all_axes = input("Enter the axes to enable during tuning (e.g., XYZ): ").strip().upper()
+    if all_axes != '':
+        all_axes = list(all_axes)
 
     # Add this section to modify and upload the MCD file
     print("\n🔧 Checking MCD configuration...")
@@ -2064,7 +2118,12 @@ if __name__ == "__main__":
         if upload_mcd_to_controller(controller, modified_mcd_path):
             controller.configuration.calibration_1d_file.remove_configuration()
             controller.configuration.calibration_2d_file.remove_configuration()
-            controller.reset()
+            test_mcd = input("Check if the MCD file is correct. Do you want to continue? (y/n): ").strip().lower()
+            if test_mcd == 'y':
+                print("Continuing with EasyTune process...")
+                controller.reset()
+            else:
+                sys.exit("Exiting EasyTune process as per user request.")
             print("✅ Controller configuration updated")
         else:
             print("⚠️ Failed to update controller configuration")
@@ -2074,13 +2133,18 @@ if __name__ == "__main__":
     so_dir = get_file_directory(controller.name)
     print(f"📁 Saving all files to: {so_dir}")
     
+    print('Performing Encoder Tuning On All Axes')
+    encoder_tuning = EncoderTuning(controller=controller, axes=all_axes)
+    encoder_tuning.test()
+    print("✅ Encoder tuning completed")
+
     test_type = input("Is this a single axis or a multi axis system? (single/multi): ")
     if test_type == 'multi':
         xy_axes = input("Enter any axes that are in an XY configuration: (e.g., XY): ").strip().upper()
         single_axes = input("Enter any axes that are not in an XY configuration: (e.g., Z): ").strip().upper()
-        main(test='FR', controller=controller, axes=xy_axes, test_type=test_type, all_axes=axes)
+        main(test='FR', controller=controller, axes=xy_axes, test_type=test_type, all_axes=all_axes)
         for axis in single_axes:
-            main(test='FR', controller=controller, axes=axis, test_type='single', all_axes=axes)
+            main(test='FR', controller=controller, axes=axis, test_type='single', all_axes=all_axes)
     if test_type == 'single':
         axis = input("Enter the axis to perform EasyTune on: ").strip().upper()
-        main(test='FR', controller=controller, axes=axis, test_type=test_type, all_axes=axes)
+        main(test='FR', controller=controller, axes=axis, test_type=test_type, all_axes=all_axes)

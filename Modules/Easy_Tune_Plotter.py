@@ -197,16 +197,16 @@ class EasyTunePlotter:
                 response.append(complex(real, imag))
         
         freq_rad = np.array(freq_rad)
+        freq_hz = freq_rad / (2 * np.pi)  # Convert to Hz
         response = np.array(response)
         
         # Convert to magnitude and phase
         magnitude_db = 20 * np.log10(np.abs(response))
         phase_deg = np.angle(response, deg=True)
         
-        # Add original data traces
         fig.add_trace(
             go.Scatter(
-                x=freq_rad,
+                x=freq_hz,  # Changed from freq_rad
                 y=magnitude_db,
                 mode='lines',
                 name='Original',
@@ -214,10 +214,10 @@ class EasyTunePlotter:
             ),
             row=1, col=1
         )
-        
+
         fig.add_trace(
             go.Scatter(
-                x=freq_rad,
+                x=freq_hz,  # Changed from freq_rad
                 y=phase_deg,
                 mode='lines',
                 name='Original',
@@ -252,6 +252,7 @@ class EasyTunePlotter:
                     response_shaped.append(complex(real, imag))
             
             freq_rad_shaped = np.array(freq_rad_shaped)
+            freq_hz_shaped = freq_rad_shaped / (2 * np.pi)  # Convert to Hz
             response_shaped = np.array(response_shaped)
             
             magnitude_db_shaped = 20 * np.log10(np.abs(response_shaped))
@@ -259,7 +260,7 @@ class EasyTunePlotter:
             
             fig.add_trace(
                 go.Scatter(
-                    x=freq_rad_shaped,
+                    x=freq_hz_shaped,  # Changed from freq_rad_shaped
                     y=magnitude_db_shaped,
                     mode='lines',
                     name='Shaped',
@@ -267,10 +268,10 @@ class EasyTunePlotter:
                 ),
                 row=1, col=1
             )
-            
+
             fig.add_trace(
                 go.Scatter(
-                    x=freq_rad_shaped,
+                    x=freq_hz_shaped,  # Changed from freq_rad_shaped
                     y=phase_deg_shaped,
                     mode='lines',
                     name='Shaped',
@@ -288,7 +289,7 @@ class EasyTunePlotter:
         )
         
         # Update axes labels
-        fig.update_xaxes(title_text="Frequency (rad/s)", type="log", row=2, col=1)
+        fig.update_xaxes(title_text="Frequency (Hz)", type="log", row=2, col=1)
         fig.update_yaxes(title_text="Magnitude (dB)", row=1, col=1)
         fig.update_yaxes(title_text="Phase (degrees)", row=2, col=1)
         
