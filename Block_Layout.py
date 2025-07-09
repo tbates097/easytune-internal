@@ -295,7 +295,7 @@ class Block_Layout_With_Data():
 
         # Filename (if any).
         self.filename = filename
-        print(f'Block_Layout Filename: {self.filename}')
+
         # A1 Data.
         if a1_data is None:
             self.a1_data = a1_interface.get_a1_data_from_block_layout(Block_Layout())

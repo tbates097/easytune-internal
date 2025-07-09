@@ -5,13 +5,25 @@ Created on Fri Oct 11 14:55:16 2024
 @author: TBates
 """
 import automation1 as a1
+import logging
 
 class decode_faults:
     def __init__(self, faults_per_axis, connected_axes, controller: a1.Controller, fault_log):
         self.faults_per_axis = faults_per_axis
         self.connected_axes = connected_axes
         self.controller = controller
-        self.fault_log = fault_log
+        
+        if fault_log is None:
+            logger = logging.getLogger(controller.name)
+            logger.setLevel(logging.ERROR)
+            if not logger.handlers:
+                handler = logging.FileHandler(f"{controller.name}_faults.log")
+                formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+            self.fault_log = logger
+        else:
+            self.fault_log = fault_log
         
     def get_fault(self):
         fault_dict = {
@@ -51,8 +63,9 @@ class decode_faults:
                     present_faults.append(fault_name)
             
             self.decoded_faults_per_axis[axis] = present_faults  # Store decoded faults per axis
-
-        self.log_faults()
+        
+        if any(self.decoded_faults_per_axis[axis] for axis in self.decoded_faults_per_axis):
+            self.log_faults()
         
     def log_faults(self):
         for axis in self.connected_axes:
@@ -66,3 +79,21 @@ class decode_faults:
         self.controller.runtime.commands.fault_and_error.acknowledgeall(1)
         for axis in self.connected_axes:
             self.controller.runtime.commands.motion.enable([axis])
+
+        self.download_mcd()
+
+    def download_mcd(self):
+        import os
+        try:
+            userprofile = os.environ.get("USERPROFILE") or os.path.expanduser("~")
+            mcd_path = os.path.join(
+                userprofile,
+                "Documents",
+                "Automation1",
+                f"{self.controller.name}.mcd"
+            )
+            self.controller.download_mcd_to_file(mcd_path, True, True)
+            print('MCD file downloaded successfully.')
+        except Exception as e:
+            self.fault_log.error(f'Failed to download MCD file: {e}')
+            print(f'Failed to download MCD file: {e}')

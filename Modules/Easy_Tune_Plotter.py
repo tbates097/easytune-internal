@@ -113,7 +113,7 @@ class EasyTunePlotter:
 
             # Extract axis and position from filename
             filename = os.path.basename(log_filepath)
-            axis_match = re.search(r'test-([A-Z])-', filename)
+            axis_match = re.search(r'test-([A-Za-z0-9_]+)-', filename)
             position_match = re.search(r'-([A-Za-z\s]+)-(?:Verification)?\.log', filename)
 
             if axis_match:
@@ -159,10 +159,10 @@ class EasyTunePlotter:
 
         return stability_data
 
-    def create_bode_plot(self, original_frd, shaped_frd=None, position=None):
+    def create_bode_plot(self, original_frd, shaped_frd=None, position=None, axis=None):
         """Create a Bode plot from frequency response data"""
-        title = f"Bode Plot for {position}"
-
+        title = f"Bode Plot for {axis} - {position}"
+        
         # Create figure with subplots
         fig = make_subplots(
             rows=2, cols=1,
@@ -293,8 +293,7 @@ class EasyTunePlotter:
         fig.update_yaxes(title_text="Magnitude (dB)", row=1, col=1)
         fig.update_yaxes(title_text="Phase (degrees)", row=2, col=1)
         
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_filename = f"Bode Plot_{position}_{timestamp}.html"
+        output_filename = f"Bode Plot_{axis}_{position}.html"
         output_path = os.path.join(self.output_dir, output_filename)
         pyo.plot(fig, filename=output_path, auto_open=False)
         print(f"📊 Bode plot saved to: {output_path}")
@@ -329,8 +328,8 @@ class EasyTunePlotter:
             return None
         
         if not output_filename:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_filename = f"stability_analysis_{timestamp}.html"
+            #timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_filename = f"stability_analysis.html"
         
         # Create stability analysis plots
         fig = make_subplots(
@@ -655,24 +654,3 @@ class EasyTunePlotter:
             print("✅ Stability analysis created")
         
         print(f"📁 All plots saved to: {self.output_dir}")
-
-def main():
-    """Example usage of the EasyTunePlotter"""
-    import glob
-    
-    # Initialize plotter
-    plotter = EasyTunePlotter()
-    
-    # Find FR and log files in current directory
-    fr_files = glob.glob("*.fr")
-    log_files = glob.glob("*.log")
-    
-    print(f"Found {len(fr_files)} FR files and {len(log_files)} log files")
-    
-    if fr_files or log_files:
-        plotter.create_combined_analysis(fr_files, log_files)
-    else:
-        print("No FR or log files found. Place some test files in the current directory.")
-
-if __name__ == "__main__":
-    main()

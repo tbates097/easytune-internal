@@ -1,0 +1,567 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "CustomWrapper/1.0.0": {
+        "dependencies": {
+          "Aerotech.Automation1.Applications.Controls": "2.10.0.2922",
+          "Aerotech.Automation1.Applications.Core": "2.10.0.3036",
+          "Aerotech.Automation1.Applications.Interfaces": "2.10.0.3036",
+          "Aerotech.Automation1.Applications.Modules": "2.10.0.3041",
+          "Aerotech.Automation1.Applications.Shared": "2.10.0.3036",
+          "Aerotech.Automation1.Applications.Wpf": "2.10.0.3041",
+          "Prism": "8.1.97.5143",
+          "Prism.Unity.Wpf": "8.1.97.5143",
+          "Prism.Wpf": "8.1.97.5143"
+        },
+        "runtime": {
+          "CustomWrapper.dll": {}
+        }
+      },
+      "Aerotech.Automation1.Applications.Controls/2.10.0.2922": {
+        "runtime": {
+          "Aerotech.Automation1.Applications.Controls.dll": {
+            "assemblyVersion": "2.10.0.2922",
+            "fileVersion": "2.10.0.2922"
+          }
+        }
+      },
+      "Aerotech.Automation1.Applications.Core/2.10.0.3036": {
+        "runtime": {
+          "Aerotech.Automation1.Applications.Core.dll": {
+            "assemblyVersion": "2.10.0.3036",
+            "fileVersion": "2.10.0.3036"
+          }
+        }
+      },
+      "Aerotech.Automation1.Applications.Interfaces/2.10.0.3036": {
+        "runtime": {
+          "Aerotech.Automation1.Applications.Interfaces.dll": {
+            "assemblyVersion": "2.10.0.3036",
+            "fileVersion": "2.10.0.3036"
+          }
+        }
+      },
+      "Aerotech.Automation1.Applications.Modules/2.10.0.3041": {
+        "runtime": {
+          "Aerotech.Automation1.Applications.Modules.dll": {
+            "assemblyVersion": "2.10.0.3041",
+            "fileVersion": "2.10.0.3041"
+          }
+        }
+      },
+      "Aerotech.Automation1.Applications.Shared/2.10.0.3036": {
+        "runtime": {
+          "Aerotech.Automation1.Applications.Shared.dll": {
+            "assemblyVersion": "2.10.0.3036",
+            "fileVersion": "2.10.0.3036"
+          }
+        }
+      },
+      "Aerotech.Automation1.Applications.Wpf/2.10.0.3041": {
+        "runtime": {
+          "Aerotech.Automation1.Applications.Wpf.dll": {
+            "assemblyVersion": "2.10.0.3041",
+            "fileVersion": "2.10.0.3041"
+          }
+        }
+      },
+      "Prism/8.1.97.5143": {
+        "runtime": {
+          "Prism.dll": {
+            "assemblyVersion": "8.1.97.5143",
+            "fileVersion": "8.1.97.5143"
+          }
+        }
+      },
+      "Prism.Unity.Wpf/8.1.97.5143": {
+        "runtime": {
+          "Prism.Unity.Wpf.dll": {
+            "assemblyVersion": "8.1.97.5143",
+            "fileVersion": "8.1.97.5143"
+          }
+        }
+      },
+      "Prism.Wpf/8.1.97.5143": {
+        "runtime": {
+          "Prism.Wpf.dll": {
+            "assemblyVersion": "8.1.97.5143",
+            "fileVersion": "8.1.97.5143"
+          }
+        }
+      },
+      "Aerotech.Automation1.DotNet/2.10.0.3036": {
+        "runtime": {
+          "Aerotech.Automation1.DotNet.dll": {
+            "assemblyVersion": "2.10.0.3036",
+            "fileVersion": "2.10.0.3036"
+          }
+        }
+      },
+      "Newtonsoft.Json/13.0.0.0": {
+        "runtime": {
+          "Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.3.27908"
+          }
+        }
+      },
+      "System.Drawing.Common/8.0.0.0": {
+        "runtime": {
+          "System.Drawing.Common.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.824.36606"
+          }
+        }
+      },
+      "Aerotech.Automation1.DotNetInternal/2.10.0.3036": {
+        "runtime": {
+          "Aerotech.Automation1.DotNetInternal.dll": {
+            "assemblyVersion": "2.10.0.3036",
+            "fileVersion": "2.10.0.3036"
+          }
+        }
+      },
+      "Aerotech.DeviceSpecifications/1.14.0.334": {
+        "runtime": {
+          "Aerotech.DeviceSpecifications.dll": {
+            "assemblyVersion": "1.14.0.334",
+            "fileVersion": "1.14.0.334"
+          }
+        }
+      },
+      "Unity.Abstractions/5.11.7.0": {
+        "runtime": {
+          "Unity.Abstractions.dll": {
+            "assemblyVersion": "5.11.7.0",
+            "fileVersion": "5.11.7.0"
+          }
+        }
+      },
+      "Aerotech.Automation1.Communication/2.10.0.3035": {
+        "runtime": {
+          "Aerotech.Automation1.Communication.dll": {
+            "assemblyVersion": "2.10.0.3035",
+            "fileVersion": "2.10.0.3035"
+          }
+        }
+      },
+      "Infragistics.WPF/24.1.20241.39": {
+        "runtime": {
+          "Infragistics.WPF.dll": {
+            "assemblyVersion": "24.1.20241.39",
+            "fileVersion": "24.1.20241.39"
+          }
+        }
+      },
+      "FlashCap.Core/1.10.0.0": {
+        "runtime": {
+          "FlashCap.Core.dll": {
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Infragistics.WPF.DragDrop/24.1.20241.39": {
+        "runtime": {
+          "Infragistics.WPF.DragDrop.dll": {
+            "assemblyVersion": "24.1.20241.39",
+            "fileVersion": "24.1.20241.39"
+          }
+        }
+      },
+      "HtmlTextWriter/3.0.1.0": {
+        "runtime": {
+          "HtmlTextWriter.dll": {
+            "assemblyVersion": "3.0.1.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "FlashCap/1.10.0.0": {
+        "runtime": {
+          "FlashCap.dll": {
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "System.DirectoryServices.AccountManagement/8.0.0.1": {
+        "runtime": {
+          "System.DirectoryServices.AccountManagement.dll": {
+            "assemblyVersion": "8.0.0.1",
+            "fileVersion": "8.0.1024.46610"
+          }
+        }
+      },
+      "MathNet.Numerics/5.0.0.0": {
+        "runtime": {
+          "MathNet.Numerics.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "Meta.Numerics/4.1.4.0": {
+        "runtime": {
+          "Meta.Numerics.dll": {
+            "assemblyVersion": "4.1.4.0",
+            "fileVersion": "4.1.4.0"
+          }
+        }
+      },
+      "Microsoft.Xaml.Behaviors/1.1.0.0": {
+        "runtime": {
+          "Microsoft.Xaml.Behaviors.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.122.28819"
+          }
+        }
+      },
+      "LightningChart.WPF.Charting.NET6/12.0.1.1": {
+        "runtime": {
+          "LightningChart.WPF.Charting.NET6.dll": {
+            "assemblyVersion": "12.0.1.1",
+            "fileVersion": "12.0.1.1"
+          }
+        }
+      },
+      "Infragistics.WPF.Controls.Menus.XamDataTree/24.1.20241.39": {
+        "runtime": {
+          "Infragistics.WPF.Controls.Menus.XamDataTree.dll": {
+            "assemblyVersion": "24.1.20241.39",
+            "fileVersion": "24.1.20241.39"
+          }
+        }
+      },
+      "ActiproSoftware.SyntaxEditor.Wpf/24.1.2.0": {
+        "runtime": {
+          "ActiproSoftware.SyntaxEditor.Wpf.dll": {
+            "assemblyVersion": "24.1.2.0",
+            "fileVersion": "24.1.2.0"
+          }
+        }
+      },
+      "ActiproSoftware.Text.Wpf/24.1.2.0": {
+        "runtime": {
+          "ActiproSoftware.Text.Wpf.dll": {
+            "assemblyVersion": "24.1.2.0",
+            "fileVersion": "24.1.2.0"
+          }
+        }
+      },
+      "ActiproSoftware.Shared.Wpf/24.1.2.0": {
+        "runtime": {
+          "ActiproSoftware.Shared.Wpf.dll": {
+            "assemblyVersion": "24.1.2.0",
+            "fileVersion": "24.1.2.0"
+          }
+        }
+      },
+      "Infragistics.WPF.DataManager/24.1.20241.39": {
+        "runtime": {
+          "Infragistics.WPF.DataManager.dll": {
+            "assemblyVersion": "24.1.20241.39",
+            "fileVersion": "24.1.20241.39"
+          }
+        }
+      },
+      "Unity.Container/5.11.11.0": {
+        "runtime": {
+          "Unity.Container.dll": {
+            "assemblyVersion": "5.11.11.0",
+            "fileVersion": "5.11.11.0"
+          }
+        }
+      },
+      "NodaTime/2.4.13.0": {
+        "runtime": {
+          "NodaTime.dll": {
+            "assemblyVersion": "2.4.13.0",
+            "fileVersion": "2.4.13.0"
+          }
+        }
+      },
+      "Aerotech.Licensing/5.5.0.246": {
+        "runtime": {
+          "Aerotech.Licensing.dll": {
+            "assemblyVersion": "5.5.0.246",
+            "fileVersion": "5.5.0.246"
+          }
+        }
+      },
+      "Aerotech.Licensing.Activation/5.5.0.246": {
+        "runtime": {
+          "Aerotech.Licensing.Activation.dll": {
+            "assemblyVersion": "5.5.0.246",
+            "fileVersion": "5.5.0.246"
+          }
+        }
+      },
+      "System.Private.ServiceModel/4.10.0.0": {
+        "runtime": {
+          "System.Private.ServiceModel.dll": {
+            "assemblyVersion": "4.10.0.0",
+            "fileVersion": "4.1000.22.41602"
+          }
+        }
+      },
+      "Aerotech.Licensing.Decoding/5.5.0.246": {
+        "runtime": {
+          "Aerotech.Licensing.Decoding.dll": {
+            "assemblyVersion": "5.5.0.246",
+            "fileVersion": "5.5.0.246"
+          }
+        }
+      },
+      "System.DirectoryServices.Protocols/8.0.0.0": {
+        "runtime": {
+          "System.DirectoryServices.Protocols.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
+      "LightningChart.DirectX/12.0.1.1": {
+        "runtime": {
+          "LightningChart.DirectX.dll": {
+            "assemblyVersion": "12.0.1.1",
+            "fileVersion": "12.0.1.1"
+          }
+        }
+      },
+      "LightningChart.DirectXInitNET/12.0.1.1": {
+        "runtime": {
+          "LightningChart.DirectXInitNET.dll": {
+            "assemblyVersion": "12.0.1.1",
+            "fileVersion": "12.0.1.1"
+          }
+        }
+      },
+      "LightningChart.DirectXFilesNET/12.0.1.1": {
+        "runtime": {
+          "LightningChart.DirectXFilesNET.dll": {
+            "assemblyVersion": "12.0.1.1",
+            "fileVersion": "12.0.1.1"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CustomWrapper/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Applications.Controls/2.10.0.2922": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Applications.Core/2.10.0.3036": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Applications.Interfaces/2.10.0.3036": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Applications.Modules/2.10.0.3041": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Applications.Shared/2.10.0.3036": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Applications.Wpf/2.10.0.3041": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Prism/8.1.97.5143": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Prism.Unity.Wpf/8.1.97.5143": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Prism.Wpf/8.1.97.5143": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.DotNet/2.10.0.3036": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Newtonsoft.Json/13.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Drawing.Common/8.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.DotNetInternal/2.10.0.3036": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.DeviceSpecifications/1.14.0.334": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Abstractions/5.11.7.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Automation1.Communication/2.10.0.3035": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Infragistics.WPF/24.1.20241.39": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FlashCap.Core/1.10.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Infragistics.WPF.DragDrop/24.1.20241.39": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "HtmlTextWriter/3.0.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FlashCap/1.10.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.DirectoryServices.AccountManagement/8.0.0.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MathNet.Numerics/5.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Meta.Numerics/4.1.4.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Xaml.Behaviors/1.1.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LightningChart.WPF.Charting.NET6/12.0.1.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Infragistics.WPF.Controls.Menus.XamDataTree/24.1.20241.39": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ActiproSoftware.SyntaxEditor.Wpf/24.1.2.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ActiproSoftware.Text.Wpf/24.1.2.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ActiproSoftware.Shared.Wpf/24.1.2.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Infragistics.WPF.DataManager/24.1.20241.39": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Unity.Container/5.11.11.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NodaTime/2.4.13.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Licensing/5.5.0.246": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Licensing.Activation/5.5.0.246": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Private.ServiceModel/4.10.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Aerotech.Licensing.Decoding/5.5.0.246": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.DirectoryServices.Protocols/8.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LightningChart.DirectX/12.0.1.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LightningChart.DirectXInitNET/12.0.1.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LightningChart.DirectXFilesNET/12.0.1.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

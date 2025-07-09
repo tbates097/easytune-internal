@@ -113,7 +113,6 @@ class EncoderTuning():
         configured_parameters = self.controller.configuration.parameters.get_configuration()
 
         for axis, gains in final_gains.items():
-            print(f"Applying gains for axis {axis}: {gains}")
             
             # Update the gains
             configured_parameters.axes[axis].feedback.primaryencoder0sinegain.value = gains['SineGain']
@@ -153,11 +152,9 @@ class EncoderTuning():
         results = self.controller.runtime.status.get_status_items(status_item_configuration)
 
         encoder_multiplication_factor = params.axes[axis].feedback.primaryencodermultiplicationfactor.value
-        print(f'Encoder Multiplication Factor: {encoder_multiplication_factor}')
         counts_per_unit = params.axes[axis].units.countsperunit.value
-        print(f'Counts Per Unit: {counts_per_unit}')
         velocitycommandfault = int(params.axes[axis].protection.faultmask.value)
-        print(f'Velocity Command Fault Bit: {velocitycommandfault}')
+
         velocitycommandthreshold = params.axes[axis].protection.velocitycommandthreshold.value
         velocitycommandbeforehome = params.axes[axis].protection.velocitycommandthresholdbeforehome.value
         if (velocitycommandfault & 1 << 10) == 0:
@@ -165,16 +162,14 @@ class EncoderTuning():
         elif velocitycommandthreshold == 0 and velocitycommandbeforehome == 0:
             velocity_command_threshold = float('inf')
         else:
-            axis_status = int(results.axis.get(a1.AxisStatusItem.AxisStatus, "X").value)
+            axis_status = int(results.axis.get(a1.AxisStatusItem.AxisStatus, axis).value)
             is_homed = (axis_status & a1.AxisStatus.Homed) == a1.AxisStatus.Homed
             velocity_command_threshold = velocitycommandthreshold if not is_homed else velocitycommandthreshold
-        print(f'Velocity Command Threshold: {velocity_command_threshold}')
+
         ramp_mode = a1.RampMode(params.tasks[task_index].motion.defaultcoordinatedrampmode.value)
-        print(f'Ramp Mode: {ramp_mode}')
         ramp_time = params.tasks[task_index].motion.defaultcoordinatedramptime.value
-        print(f'Ramp Mode: {ramp_time}')
         ramp_rate = params.tasks[task_index].motion.defaultcoordinatedramprate.value
-        print(f'Ramp Mode: {ramp_rate}')
+
 
         # Calculate distance_to_analyze (num2 in C# code)
         units_per_cycle = encoder_multiplication_factor / counts_per_unit
@@ -255,7 +250,7 @@ class EncoderTuning():
 
             # Determine if sine or square wave
             wave_type = int(self.controller.runtime.parameters.axes[axis].feedback.primaryfeedbacktype.value)
-            print(f'wave_type = {wave_type}')
+
             # Check for various sine-based encoder types
             if (wave_type in [2, 3, 10]): # 2=Sine, 3=EnDat+Sine, 10=BiSS+Sine
                 axis_specs[axis]['Encoder Type'] = 'sine'
@@ -460,7 +455,6 @@ class EncoderTuning():
                 'Phase(degrees)': final_phase_correction
             }
             final_gains_dict[axis] = final_gains
-            print(f"Final Calculated Gains for {axis}: {final_gains}")
             
         return final_gains_dict
 
