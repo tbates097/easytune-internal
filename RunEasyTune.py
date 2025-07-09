@@ -32,6 +32,35 @@ from Modules.EncoderTuning import EncoderTuning
 global so_dir
 so_dir = None
 
+def check_stop_signal(stop_event):
+    """Check if stop was requested and raise exception if so"""
+    if stop_event and stop_event.is_set():
+        print("🛑 Stop requested - exiting current operation")
+        raise KeyboardInterrupt("Process stopped by user")
+
+def cleanup_mcd_files(base_name, dir_path):
+    """Clean up temporary MCD files created during the process"""
+    if not base_name or not dir_path:
+        return
+    
+    backup_path = os.path.join(dir_path, f"{base_name}-backup.mcd")
+    modified_path = os.path.join(dir_path, f"{base_name}-modified.mcd")
+    
+    files_to_cleanup = [backup_path, modified_path]
+    
+    print("\n🧹 Cleaning up temporary MCD files...")
+    for file_path in files_to_cleanup:
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"🗑️ Deleted: {os.path.basename(file_path)}")
+            else:
+                print(f"ℹ️ File not found (already cleaned): {os.path.basename(file_path)}")
+        except Exception as e:
+            print(f"⚠️ Could not delete {os.path.basename(file_path)}: {str(e)}")
+    
+    print("✅ MCD file cleanup completed")
+
 def modify_mcd_enabled_tasks():
     """Modifies the MCD file to ensure EnabledTasks is set correctly"""
     # Define temp_dir at the start of the function
@@ -136,7 +165,7 @@ def modify_mcd_enabled_tasks():
                     new_zip.write(file_path, arcname)
         
         print(f"✅ Modified MCD saved as: {new_mcd_path}")
-        return new_mcd_path
+        return new_mcd_path, base_name, dir_path
         
     except Exception as e:
         print(f"❌ Error modifying MCD: {str(e)}")
@@ -162,7 +191,22 @@ def upload_mcd_to_controller(controller, mdk_path):
     except Exception as e:
         print(f"❌ Error uploading MCD: {str(e)}")
         return False
-    
+
+def download_mcd_from_controller(controller, mdk_path):
+    """Uploads an MCD file to the controller"""
+    try:
+        print(f"📤 Uploading MCD file to controller...")
+        controller.download_mcd_to_file(
+            mdk_path, 
+            should_include_files=True, 
+            should_include_configuration=True
+        )
+        print("✅ MCD upload completed successfully")
+        return True
+    except Exception as e:
+        print(f"❌ Error uploading MCD: {str(e)}")
+        return False
+        
 def get_file_directory(controller_name):
     """Create and return the directory path for file storage based on SO number"""
     username = os.getlogin()
@@ -193,14 +237,15 @@ def extract_axis_from_fr_filepath(fr_filepath):
     else:
         return None
 
-def connect():
+def connect(connection_type=None):
     global controller, non_virtual_axes, connected_axes
     
     try:
         controller = a1.Controller.connect()
         controller.start()
     except:
-        connection_type = input('Are you using a Hyperwire or a USB connection? (usb/hyperwire)')
+        if connection_type is None:
+            connection_type = input('Are you using a Hyperwire or a USB connection? (usb/hyperwire)')
         if connection_type == 'usb':
             try:
                 controller = a1.Controller.connect_usb()
@@ -421,12 +466,8 @@ def convert_filters_to_coefficients(shaped_params, sample_freq=None):
     if sample_freq is None:
         if 'Drive_Frequency__hz' in shaped_params:
             sample_freq = shaped_params['Drive_Frequency__hz']
-            print(f"🔧 Using Drive Frequency as sample frequency: {sample_freq} Hz")
         else:
             sample_freq = 20000.0  # Fallback default
-            print(f"⚠️  Drive_Frequency__hz not found, using default sample frequency: {sample_freq} Hz")
-    else:
-        print(f"🔧 Using provided sample frequency: {sample_freq} Hz")
 
     if 'Filters' not in shaped_params:
         print("No filter data found in shaped parameters")
@@ -457,10 +498,6 @@ def convert_filters_to_coefficients(shaped_params, sample_freq=None):
                         'denominator': D
                     }
                     
-                    print(f"  Cutoff Frequency: {cutoff_freq:.3f} Hz")
-                    print(f"  Numerator:   [{N[0]:.6f}, {N[1]:.6f}, {N[2]:.6f}]")
-                    print(f"  Denominator: [{D[0]:.6f}, {D[1]:.6f}, {D[2]:.6f}]")
-                    
                 elif filter_type == 'Notch':
                     center_freq = parameters['Center Frequency']
                     width = parameters['Width']
@@ -473,12 +510,6 @@ def convert_filters_to_coefficients(shaped_params, sample_freq=None):
                         'numerator': N,
                         'denominator': D
                     }
-                    
-                    print(f"  Center Frequency: {center_freq:.3f} Hz")
-                    print(f"  Width: {width:.3f}")
-                    print(f"  Depth: {depth:.3f} dB")
-                    print(f"  Numerator:   [{N[0]:.6f}, {N[1]:.6f}, {N[2]:.6f}]")
-                    print(f"  Denominator: [{D[0]:.6f}, {D[1]:.6f}, {D[2]:.6f}]")
                     
                 else:
                     print(f"  Unsupported filter type: {filter_type}")
@@ -506,10 +537,6 @@ def convert_filters_to_coefficients(shaped_params, sample_freq=None):
                         'denominator': D
                     }
                     
-                    print(f"  Cutoff Frequency: {cutoff_freq:.3f} Hz")
-                    print(f"  Numerator:   [{N[0]:.6f}, {N[1]:.6f}, {N[2]:.6f}]")
-                    print(f"  Denominator: [{D[0]:.6f}, {D[1]:.6f}, {D[2]:.6f}]")
-                    
                 elif filter_type == 'Notch':
                     center_freq = parameters['Center Frequency']
                     width = parameters['Width']
@@ -522,12 +549,6 @@ def convert_filters_to_coefficients(shaped_params, sample_freq=None):
                         'numerator': N,
                         'denominator': D
                     }
-                    
-                    print(f"  Center Frequency: {center_freq:.3f} Hz")
-                    print(f"  Width: {width:.3f}")
-                    print(f"  Depth: {depth:.3f} dB")
-                    print(f"  Numerator:   [{N[0]:.6f}, {N[1]:.6f}, {N[2]:.6f}]")
-                    print(f"  Denominator: [{D[0]:.6f}, {D[1]:.6f}, {D[2]:.6f}]")
                     
                 else:
                     print(f"  Unsupported filter type: {filter_type}")
@@ -599,10 +620,6 @@ def apply_filter_coefficients_to_controller(axis, filter_coefficients, controlle
                 N = filter_data['numerator']
                 D = filter_data['denominator']
                 filter_type = filter_data['type']
-                
-                print(f"  Applying Filter {filter_index} ({filter_type}):")
-                print(f"    Numerator:   [{N[0]:.6f}, {N[1]:.6f}, {N[2]:.6f}]")
-                print(f"    Denominator: [{D[0]:.6f}, {D[1]:.6f}, {D[2]:.6f}]")
                 
                 # Format filter index with leading zero (00, 01, 02, ..., 12)
                 filter_idx_str = f"{filter_index:02d}"
@@ -774,10 +791,6 @@ def apply_new_servo_params(axis, results, controller, ff_analysis_data=None, ver
                 # Convert dB to absolute units and multiply by original Aff
                 center_mag_absolute = 10**(center_mag_diff/20)  # Convert from dB to absolute units
                 aff_adjusted = aff_original * center_mag_absolute
-                print(f'🔧 FF ANALYSIS ADJUSTMENT:')
-                print(f'   Aff Original: {aff_original:.6f}')
-                print(f'   Center Mag Diff: {center_mag_diff:+.6f} dB')
-                print(f'   Center Mag Absolute: {center_mag_absolute:.6f}')
                 print(f'   Aff Adjusted: {aff_adjusted:.6f}')
                 configured_parameters.axes[axis].servo.feedforwardgainaff.value = aff_adjusted
             else:
@@ -1004,8 +1017,8 @@ def frequency_response(axis, controller, current_percent, verification=False, po
     #fr_string = fr'AppFrequencyResponseTriggerMultisinePlus({axis}, "{fr_filename}", 10, 2500, 280, {current_percent}, TuningMeasurementType.ServoOpenLoop, 0, 0)'
     
     controller.runtime.commands.execute(fr_string,2)
+    axis_faults = check_for_faults(controller, axes if axes else [axis])
 
-    axis_faults = check_for_faults(controller, axes)
     if axis_faults:
         fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
         decoded_faults = fault_init.get_fault()
@@ -1022,7 +1035,6 @@ def frequency_response(axis, controller, current_percent, verification=False, po
     
     if os.path.exists(source_path):
         os.replace(source_path, fr_filepath)
-        print(f"✅ Moved {fr_filename} to SO directory")
     else:
         print(f"❌ Could not find {fr_filename} in default location")
         
@@ -1045,6 +1057,13 @@ def optimize(fr_filepath=None, verification=False, position=None):
     # Get the analysis results
     results, original_frd = easy_tune_module.get_results()
 
+    if results is None:
+        print("❌ EasyTune optimization failed - no results available")
+        return None, False, None, 0
+    
+    if original_frd is None:
+        print("⚠️ Warning: No original FRD data available - continuing without plots")
+        
     shaped_data = results['Stability_Metrics']['original']
     if 'sensitivity' in shaped_data:
         sensitivity = shaped_data['sensitivity']['db']
@@ -1119,7 +1138,23 @@ def single_axis_frequency_response(axis, controller, current_percent, all_axes=N
     # Home axes first
     print("\n🏠 Homing axes...")
     controller.runtime.commands.motion.enable(all_axes)
+    
+    # Check for faults after enable
+    axis_faults = check_for_faults(controller, all_axes)
+    if axis_faults:
+        fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
+        decoded_faults = fault_init.get_fault()
+        print(f"❌ Faults detected after enable: {decoded_faults}")
+    
     controller.runtime.commands.motion.home(axis)
+    
+    # Check for faults after homing
+    axis_faults = check_for_faults(controller, all_axes if all_axes else [axis])
+    if axis_faults:
+        fault_init = decode_faults(axis_faults, all_axes if all_axes else [axis], controller, fault_log = None)
+        decoded_faults = fault_init.get_fault()
+        print(f"❌ Faults detected after homing: {decoded_faults}")
+    
     time.sleep(2)
 
     for position in test_positions:
@@ -1133,9 +1168,9 @@ def single_axis_frequency_response(axis, controller, current_percent, all_axes=N
         
         # Check for faults after move
         
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes if all_axes else [axis])
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes if all_axes else [axis], controller, fault_log = None)
             decoded_faults = fault_init.get_fault()    
         
             print(f"❌ Faults detected at {position['name']}: {decoded_faults}")
@@ -1152,18 +1187,7 @@ def single_axis_frequency_response(axis, controller, current_percent, all_axes=N
             position=position,
             axes=all_axes
         )
-        #if position['name'] == 'Center':
-                ## Step 2: EasyTune Optimization
-                #print("\n🎯 STEP 2: EasyTune Optimization")
-                #results, stability_passed, ff_analysis_data = optimize(fr_filepath=fr_filepath, verification=True, position=position)
-                #if not stability_passed:
-                    #if results:
-                        #success = apply_new_servo_params(axis, results, controller, ff_analysis_data)
-                        #controller.reset()
-                        #controller.runtime.commands.motion.enable(all_axes)
-                        #controller.runtime.commands.motion.home(axis)
-                #else:
-                    #print(f"⚠️  OPTIMIZATION FOR AXIS: {axis} PASSED - Parameter adjustments not needed...")
+
         fr_files.append(fr_filepath)
 
         print("✅ Initial Frequency Responses Completed")
@@ -1248,7 +1272,23 @@ def multi_axis_frequency_response(axes, controller, current_percent, all_axes=No
     print("\n🏠 Homing axes...")
 
     controller.runtime.commands.motion.enable(all_axes)
+    
+    # Check for faults after enable
+    axis_faults = check_for_faults(controller, all_axes)
+    if axis_faults:
+        fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
+        decoded_faults = fault_init.get_fault()
+        print(f"❌ Faults detected after enable: {decoded_faults}")
+    
     controller.runtime.commands.motion.home(axes)
+    
+    # Check for faults after homing
+    axis_faults = check_for_faults(controller, all_axes if all_axes else axes)
+    if axis_faults:
+        fault_init = decode_faults(axis_faults, all_axes if all_axes else axes, controller, fault_log = None)
+        decoded_faults = fault_init.get_fault()
+        print(f"❌ Faults detected after homing: {decoded_faults}")
+    
     controller.runtime.commands.motion.waitformotiondone(axes)
     time.sleep(2)
 
@@ -1283,18 +1323,6 @@ def multi_axis_frequency_response(axes, controller, current_percent, all_axes=No
                 position=position,
                 axes=axes
             )
-            #if position['name'] == 'Center':
-                # Step 2: EasyTune Optimization
-                #print("\n🎯 STEP 2: EasyTune Optimization")
-                #results, stability_passed, ff_analysis_data = optimize(fr_filepath=fr_filepath, verification=True, position=position)
-                #if not stability_passed:
-                    #if results:
-                        #success = apply_new_servo_params(axis, results, controller, ff_analysis_data)
-                        #controller.reset()
-                        #controller.runtime.commands.motion.enable(all_axes)
-                        #controller.runtime.commands.motion.home(axes)
-                #else:
-                    #print(f"⚠️  OPTIMIZATION FOR AXIS: {axis} PASSED - Parameter adjustments not needed...")
 
             fr_files.append(fr_filepath)
             
@@ -1395,9 +1423,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['pos'] = controller.runtime.data_collection.get_results(config, n)
@@ -1409,9 +1437,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['neg'] = controller.runtime.data_collection.get_results(config, n)
@@ -1431,9 +1459,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['pos'] = controller.runtime.data_collection.get_results(config, n)
@@ -1445,9 +1473,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['neg'] = controller.runtime.data_collection.get_results(config, n)
@@ -1466,9 +1494,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         time.sleep(3)
         controller.runtime.data_collection.stop()
 
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes)
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
             decoded_faults = fault_init.get_fault()
 
         results['SW_NE'] = controller.runtime.data_collection.get_results(config, n)
@@ -1480,9 +1508,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         time.sleep(3)
         controller.runtime.data_collection.stop()
 
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes)
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
             decoded_faults = fault_init.get_fault()
 
         results['NE_SW'] = controller.runtime.data_collection.get_results(config, n)
@@ -1500,9 +1528,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         time.sleep(3)
         controller.runtime.data_collection.stop()
 
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes)
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
             decoded_faults = fault_init.get_fault()
 
         results['SE_NW'] = controller.runtime.data_collection.get_results(config, n)
@@ -1514,9 +1542,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         time.sleep(3)
         controller.runtime.data_collection.stop()
 
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes)
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
             decoded_faults = fault_init.get_fault()
 
         results['NW_SE'] = controller.runtime.data_collection.get_results(config, n)
@@ -1527,9 +1555,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         controller.runtime.commands.motion.waitformotiondone(axis_keys)
         time.sleep(1)
 
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes)
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
             decoded_faults = fault_init.get_fault()
 
         print("✅ Diagonal movement sequence completed")
@@ -1567,12 +1595,29 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         # Home axes first
         print("\n🏠 Homing axes...")
         controller.runtime.commands.motion.enable(all_axes)
+        
+        # Check for faults after enable
+        axis_faults = check_for_faults(controller, all_axes)
+        if axis_faults:
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
+            decoded_faults = fault_init.get_fault()
+            print(f"❌ Faults detected after enable: {decoded_faults}")
+        
         controller.runtime.commands.motion.home(axis)
+        
+        # Check for faults after homing
+        axis_faults = check_for_faults(controller, all_axes if all_axes else [axis])
+        if axis_faults:
+            fault_init = decode_faults(axis_faults, all_axes if all_axes else [axis], controller, fault_log = None)
+            decoded_faults = fault_init.get_fault()
+            print(f"❌ Faults detected after homing: {decoded_faults}")
+        
+        controller.runtime.commands.motion.waitformotiondone([axis])
         time.sleep(2)
         
-        axis_faults = check_for_faults(controller, axes)
+        axis_faults = check_for_faults(controller, all_axes)
         if axis_faults:
-            fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+            fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
             decoded_faults = fault_init.get_fault()
 
         # Execute diagonal movement sequence
@@ -1598,9 +1643,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['pos'] = controller.runtime.data_collection.get_results(config, n)
@@ -1612,9 +1657,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['neg'] = controller.runtime.data_collection.get_results(config, n)
@@ -1636,9 +1681,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['pos'] = controller.runtime.data_collection.get_results(config, n)
@@ -1650,9 +1695,9 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(3)
             controller.runtime.data_collection.stop()
 
-            axis_faults = check_for_faults(controller, axes)
+            axis_faults = check_for_faults(controller, all_axes)
             if axis_faults:
-                fault_init = decode_faults(axis_faults, axes, controller, fault_log = None)
+                fault_init = decode_faults(axis_faults, all_axes, controller, fault_log = None)
                 decoded_faults = fault_init.get_fault()
 
             results['neg'] = controller.runtime.data_collection.get_results(config, n)
@@ -1887,7 +1932,7 @@ def plot_stage_performance_results(results, test_type, axes_dict):
     
     print(f"✅ All {test_type} axis stage performance plots created.")
 
-def init_fr(all_axes=None, test_type=None, axes=None, controller=None, init_current=None):
+def init_fr(all_axes=None, test_type=None, axes=None, controller=None, init_current=None, axes_params=None):
     global so_dir
     
     rotary = False
@@ -1901,8 +1946,12 @@ def init_fr(all_axes=None, test_type=None, axes=None, controller=None, init_curr
             print("❌ No axis specified. Exiting...")
             return
         print(f"📋 Selected Axis: {axis}")
-        max_velocity = float(input(f"Enter the max velocity for {axis} axis: "))
-        max_accel = float(input(f"Enter the max acceleration for {axis} axis: "))
+        if axes_params and axis in axes_params:
+            max_velocity = float(axes_params[axis]['velocity'])
+            max_accel = float(axes_params[axis]['acceleration'])
+        else:
+            max_velocity = float(input(f"Enter the max velocity for {axis} axis: "))
+            max_accel = float(input(f"Enter the max acceleration for {axis} axis: "))
         axes_dict[axis] = [max_velocity, max_accel]
 
         controller.runtime.commands.motion.enable(all_axes)
@@ -1948,8 +1997,12 @@ def init_fr(all_axes=None, test_type=None, axes=None, controller=None, init_curr
             axes = list(axes)
             print(f"📋 Selected Axes: {axes}")
             for axis in axes:
-                max_velocity = float(input(f"Enter the max velocity for {axis} axis: "))
-                max_accel = float(input(f"Enter the max acceleration for {axis} axis: "))
+                if axes_params and axis in axes_params:
+                    max_velocity = float(axes_params[axis]['velocity'])
+                    max_accel = float(axes_params[axis]['acceleration'])
+                else:
+                    max_velocity = float(input(f"Enter the max velocity for {axis} axis: "))
+                    max_accel = float(input(f"Enter the max acceleration for {axis} axis: "))
                 axes_dict[axis] = [max_velocity, max_accel]
         
         # Get travel limits for both axes
@@ -2130,10 +2183,10 @@ def validate_performance(controller=None, axes_dict=None, test_type=None, axis_l
     print("✅ Stage Performance Validation Completed")
     print("="*60)
 
-def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
-    """Main function with verification flow"""
-    
-    if test == 'FR':
+def run_fr_test(controller, axes, test_type, all_axes, axes_params=None, stop_event=None):
+    """Run the frequency response testing for a specific set of axes"""
+    try:
+        check_stop_signal(stop_event)
         print("🚀 Starting Complete EasyTune Process with Verification")
         print("="*60)
 
@@ -2147,7 +2200,8 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
         init_current = 5
         ver_current = 10
         
-        # Check init and ver currents agains thresholds
+        # Check init and ver currents against thresholds
+        check_stop_signal(stop_event)
         for axis in axes:
             init_current_amp = current_thresholds[axis]['max'] * (init_current / 100)
             ver_current_amp = current_thresholds[axis]['max'] * (ver_current / 100)
@@ -2157,11 +2211,11 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
                 init_current = new_init_current
             if ver_current_amp > (current_thresholds[axis]['average'] / 2):
                 new_ver_current = 5
-                #new_ver_current = (0.5 * current_thresholds[axis]['average']) / current_thresholds[axis]['max'] * 100
                 print(f"⚠️ Verification current {ver_current} exceeds average current threshold for axis {axis}. Adjusting to {new_ver_current:.2f}% of max current.")
                 ver_current = new_ver_current
 
         # Set position error to 10x for axes being tuned
+        check_stop_signal(stop_event)
         current_pos_error = {}
         config_params = controller.configuration.parameters.get_configuration()
         for axis in axes:
@@ -2172,14 +2226,17 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
             controller.configuration.parameters.set_configuration(config_params)
         controller.reset()
 
-        log_files, axes_dict, axis_limits = init_fr(all_axes=all_axes, test_type=test_type, axes=axes, controller=controller, init_current=init_current)
+        check_stop_signal(stop_event)
+        log_files, axes_dict, axis_limits = init_fr(all_axes=all_axes, test_type=test_type, axes=axes, controller=controller, init_current=init_current, axes_params=axes_params)
         
+        check_stop_signal(stop_event)
         ver_failed = verify_fr(all_axes=all_axes, test_type=test_type, axes=axes, controller=controller, log_files=log_files, axes_dict=axes_dict, axis_limits=axis_limits, ver_current=ver_current)
         
         # Re-verify if needed (maximum of 3 attempts)
         attempts = 1
         max_attempts = 3
         while ver_failed and attempts < max_attempts:
+            check_stop_signal(stop_event)
             print(f"\n⚠️ Verification attempt {attempts + 1} of {max_attempts}")
             ver_failed = verify_fr(all_axes=all_axes, test_type=test_type, axes=axes, controller=controller,
                                  log_files=log_files, axes_dict=axes_dict, axis_limits=axis_limits, ver_current=ver_current)
@@ -2189,76 +2246,174 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None):
             print("\n❌ Maximum verification attempts reached without success")
         else:
             print("\n✅ Verification completed successfully")
+        
+        # Set position error back to original value
+        check_stop_signal(stop_event)
+        config_params = controller.configuration.parameters.get_configuration()
+        for axis in axes:
+            config_params.axes[axis].protection.positionerrorthreshold.value = current_pos_error[axis]
+            controller.configuration.parameters.set_configuration(config_params)
+        controller.reset()
+        
+        return log_files, axes_dict, axis_limits
+        
+    except KeyboardInterrupt:
+        print(f"\n🛑 FR test stopped for axes: {axes}")
+        return None, None, None
+
+def main(test=None, controller=None, axes=None, test_type=None, all_axes=None, ui_params=None):
+    """Main function with verification flow"""
     
-    # Set position error back to original value
-    config_params = controller.configuration.parameters.get_configuration()
-    for axis in axes:
-        config_params.axes[axis].protection.positionerrorthreshold.value = current_pos_error[axis]
-        controller.configuration.parameters.set_configuration(config_params)
-    controller.reset()
+    # Get stop event from ui_params
+    stop_event = ui_params.get('stop_event') if ui_params else None
+    mcd_cleanup_info = None
+    
+    # Handle UI-driven execution - Initial setup phase
+    if ui_params:
+        try:
+            # Check for stop before each major operation
+            check_stop_signal(stop_event)
+            
+            # UI provides all parameters, set up everything
+            global so_dir
+            
+            # 1. Connect to controller
+            print("🔌 Connecting to controller...")
+            check_stop_signal(stop_event)
+            connection_type = ui_params.get('connection_type')
+            controller, available_axes = connect(connection_type)
+            
+            # 2. Set up directories
+            check_stop_signal(stop_event)
+            so_dir = get_file_directory(controller.name)
+            print(f"📁 Saving all files to: {so_dir}")
+            
+            # 3. Handle MCD configuration
+            check_stop_signal(stop_event)
+            print("\n🔧 Checking MCD configuration...")
+            mcd_result = modify_mcd_enabled_tasks()
+            if mcd_result:
+                modified_mcd_path, base_name, dir_path = mcd_result
+                mcd_cleanup_info = (base_name, dir_path)
+            else:
+                print("⚠️ No MCD modifications needed or file not selected")
+                return
+            
+            if modified_mcd_path:
+                check_stop_signal(stop_event)
+                print("✅ MCD configuration updated")
+                if upload_mcd_to_controller(controller, modified_mcd_path):
+                    if ui_params.get('cal_file_ready', True):
+                        print("✅ Controller configuration updated")
+                    else:
+                        print("⚠️ Calibration files not ready")
+                else:
+                    print("⚠️ Failed to update controller configuration")
+            else:
+                print("ℹ️ No MCD modifications needed or file not selected")
+            
+            # 4. Encoder tuning
+            check_stop_signal(stop_event)
+            all_axes = ui_params.get('all_axes', [])
+            print('Performing Encoder Tuning On All Axes')
+            encoder_tuning = EncoderTuning(controller=controller, axes=all_axes)
+            encoder_tuning.test()
+            print("✅ Encoder tuning completed")
+            
+            # 5. Follow the test roadmap
+            check_stop_signal(stop_event)
+            test_type = ui_params.get('test_type', 'single')
+            axes_params = ui_params.get('axes_params')
+            
+            if test_type == 'multi':
+                # Get XY axes and other axes from UI params
+                xy_axes = ui_params.get('xy_axes', [])
+                other_axes = ui_params.get('other_axes', [])
+                
+                # Process XY axes first
+                if xy_axes:
+                    check_stop_signal(stop_event)
+                    run_fr_test(controller=controller, axes=xy_axes, 
+                               test_type='multi', all_axes=all_axes, 
+                               axes_params=axes_params, stop_event=stop_event)
+                
+                # Process other axes individually
+                for axis in other_axes:
+                    check_stop_signal(stop_event)
+                    run_fr_test(controller=controller, axes=[axis], 
+                               test_type='single', all_axes=all_axes, 
+                               axes_params=axes_params, stop_event=stop_event)
+                return
+                
+            elif test_type == 'single':
+                # Get single axis from UI params
+                single_axis = ui_params.get('single_axis', '')
+                if isinstance(single_axis, list):
+                    single_axis = single_axis[0] if single_axis else ''
+                print(f'Single Axis To Test: {single_axis}')
+                
+                check_stop_signal(stop_event)
+                run_fr_test(controller=controller, axes=[single_axis], 
+                           test_type=test_type, all_axes=all_axes, 
+                           axes_params=axes_params, stop_event=stop_event)
+                return
+
+            # Download Loaded MCD and move results folder to EngOnly
+            check_stop_signal(stop_event)
+            loaded_base_name = re.sub(r'(?i)\b(no\s*load)\b', 'Loaded', base_name)
+            
+            MCD_path = os.path.join(dir_path, f"{loaded_base_name}.mcd")
+            download_mcd_from_controller(controller, MCD_path)
+
+            # Move results folder to EngOnly directory
+            parent_dir = os.path.dirname(os.path.dirname(dir_path))
+            engonly_dir = os.path.join(parent_dir, "EngOnly")
+            
+            # Create EngOnly directory if it doesn't exist
+            if not os.path.exists(engonly_dir):
+                os.makedirs(engonly_dir)
+                print(f"📁 Created EngOnly directory: {engonly_dir}")
+            
+            # Move the results folder (so_dir) to EngOnly
+            if os.path.exists(so_dir):
+                results_folder_name = os.path.basename(so_dir)
+                destination_path = os.path.join(engonly_dir, results_folder_name)
+                
+                try:
+                    # Remove destination if it exists
+                    if os.path.exists(destination_path):
+                        shutil.rmtree(destination_path)
+                    
+                    shutil.move(so_dir, destination_path)
+                    print(f"📁 Moved results folder to: {destination_path}")
+                except Exception as e:
+                    print(f"❌ Error moving results folder: {str(e)}")
+            else:
+                print(f"⚠️ Results folder not found: {so_dir}")
+            
+            # Clean up temporary MCD files
+            if mcd_cleanup_info:
+                base_name, dir_path = mcd_cleanup_info
+                cleanup_mcd_files(base_name, dir_path)
+            
+        except KeyboardInterrupt:
+            print("\n🛑 EasyTune process stopped by user")
+            return
+        except Exception as e:
+            if stop_event and stop_event.is_set():
+                print("\n🛑 Process stopped during execution")
+            else:
+                raise  # Re-raise if it's not a stop-related exception
+    
+    # FR Testing section - This is for the original main() interface
+    if test == 'FR':
+        # Call the extracted function
+        axes_params = ui_params.get('axes_params') if ui_params else None
+        log_files, axes_dict, axis_limits = run_fr_test(controller, axes, test_type, all_axes, axes_params, stop_event)
 
     if test == 'validate':
         validate_stage_performance(controller=controller, axes_dict=axes_dict, test_type=test_type, axis_limits=axis_limits, all_axes=all_axes)
 
-if __name__ == "__main__":
-    controller, axes = connect()
-    print(f"Available axes: {axes}")
 
-    # Ask user to specify axes they would like enabled during tuning
-    all_axes_str = input("Enter the axes to enable during tuning, separated by spaces (e.g., X Yy Rz): ").strip()
     
-    # Use .split() to create a list of strings. This correctly handles any name.
-    all_axes = all_axes_str.split()
-
-    # Add this section to modify and upload the MCD file
-    print("\n🔧 Checking MCD configuration...")
-    modified_mcd_path = modify_mcd_enabled_tasks()  # Remove the controller.name parameter
-    if modified_mcd_path:
-        print("✅ MCD configuration updated")
-        # Upload the modified MCD to the controller
-        if upload_mcd_to_controller(controller, modified_mcd_path):
-            cal_file = input("Please combine and load cal file(s). Key in (y/n) when ready: ").strip().lower()
-            #controller.configuration.calibration_1d_file.remove_configuration()
-            #controller.configuration.calibration_2d_file.remove_configuration()
-            #controller.reset()
-            print("✅ Controller configuration updated")
-        else:
-            print("⚠️ Failed to update controller configuration")
-    else:
-        print("ℹ️ No MCD modifications needed or file not selected")
-
-    so_dir = get_file_directory(controller.name)
-    print(f"📁 Saving all files to: {so_dir}")
     
-    print('Performing Encoder Tuning On All Axes')
-    encoder_tuning = EncoderTuning(controller=controller, axes=all_axes)
-    encoder_tuning.test()
-    print("✅ Encoder tuning completed")
-
-    # The initial question remains the same.
-    test_type = input("Is this a single axis or a multi axis system? (single/multi): ")
-    
-    if test_type == 'multi':
-        # This prompt for the ganged axes is unchanged.
-        xy_axes_str = input("Enter any axes that are in an XY configuration, separated by spaces: (e.g., X Y): ").strip()
-        xy_axes_list = xy_axes_str.split()
-    
-        # The prompt for other axes.
-        single_axes_input = input("Enter any other axes, separated by spaces (e.g., Rz Theta Z): ").strip()
-        single_axes_list = single_axes_input.split()
-        
-        # This call is already correct because .split() creates a list.
-        if xy_axes_list:
-            main(test='FR', controller=controller, axes=xy_axes_list, test_type=test_type, all_axes=all_axes)
-        
-        # Loop through the list of single axes.
-        for axis in single_axes_list:
-            # --- FIX: Pass 'axis' as a single-item list ---
-            main(test='FR', controller=controller, axes=[axis], test_type='single', all_axes=all_axes)
-    
-    elif test_type == 'single':
-        axis = input("Enter the axis to perform EasyTune on: ").strip()
-        print(f'Single Axis To Test: {axis}')
-        
-        # --- FIX: Pass 'axis' as a single-item list ---
-        main(test='FR', controller=controller, axes=[axis], test_type=test_type, all_axes=all_axes)

@@ -41,6 +41,7 @@ class Easy_Tune_Module():
         self.exception = None
         self.fr_filepath = None
         self.results = None  # Store analysis results
+        self.original_frd = None
         self.results_filepath = None  # Store path to results file
 
         # Only setup GUI components if gui is provided
@@ -702,6 +703,14 @@ class Easy_Tune_Module():
         """Get the analysis results after EasyTune completion.
         
         Returns:
-            dict: Analysis results dictionary, or None if not available
+            tuple: (results_dict, original_frd) or (None, None) if not available
         """
+        if not hasattr(self, 'results') or self.results is None:
+            print("⚠️ Warning: No results available - EasyTune may not have completed successfully")
+            return None, None
+            
+        if not hasattr(self, 'original_frd') or self.original_frd is None:
+            print("⚠️ Warning: No original FRD available - analysis may have failed")
+            return self.results, None
+            
         return self.results, self.original_frd
