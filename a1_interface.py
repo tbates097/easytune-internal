@@ -778,12 +778,15 @@ def get_a1_data_from_block_layout(block_layout:Block_Layout.Block_Layout, data:F
         
         return FrequencyResponseResult(data.Configuration, data.InputMode, axis_data)
 
-def run_easy_tune(block_layout:Block_Layout.Block_Layout, data:FrequencyResponseResult, verification=False) -> dict:
+def run_easy_tune(block_layout:Block_Layout.Block_Layout, data:FrequencyResponseResult, verification=False, sensitivity=None) -> dict:
     def get_max_sensitivity():
         # NOTE: This function re-implements:
         # https://scm2.aerotech.com/projects/CTRL/repos/automation1/browse/pc/libs/ApplicationWpfLibrary/Source/Services/TuningService/EasyTune/EasyTuneService.cs?at=refs%2Ftags%2FRelease_2.10.0#25,75,77,80,82
         from Modules.Easy_Tune_Module import OPTIMIZATION_TARGET_RANGE_MIN, OPTIMIZATION_TARGET_RANGE_MAX
-        optimization_target = -2
+        if sensitivity is None:
+            optimization_target = 0
+        else:
+            optimization_target = sensitivity
         stage_type = data.AxisData.DeviceInformation.StageType
         sensitivity_min = 2 if stage_type == TuningStageType.StandardStage else 2
         sensitivity_max = 8 if stage_type == TuningStageType.StandardStage else 6
@@ -910,9 +913,10 @@ def run_easy_tune(block_layout:Block_Layout.Block_Layout, data:FrequencyResponse
         generation_log = result.GenerationLog
 
         # Make log directory if it does not already exist.
-        working_directory = os.path.join(Globals.DEFAULT_DIRECTORY, "EasyTune Logs")
+        username = os.getlogin()
+        working_directory = os.path.join(f"C:\\Users\\{username}\\Documents\\Automation1", "EasyTune Logs")
         if not os.path.exists(working_directory):
-            os.mkdir(working_directory)
+            os.makedirs(working_directory)
 
         current_time = datetime.now()
         time_string = current_time.strftime("%Y.%m.%d %H.%M.%S")

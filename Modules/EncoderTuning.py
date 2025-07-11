@@ -55,7 +55,6 @@ class EncoderTuning():
             type_name2 = "Aerotech.Automation1.Applications.Shared.EllipseData, Aerotech.Automation1.Applications.Shared"
             self.EllipseFit = System.Type.GetType(type_name1, True) # True throws exception if not found
             self.EllipseData = System.Type.GetType(type_name2, True)
-            print("Successfully retrieved Aerotech types for encoder tuning.")
         except Exception as e:
             print("\nFATAL: Could not retrieve required Aerotech types.")
             print("Ensure that the main application has loaded the Aerotech.Automation1.Applications.Shared.dll.")
@@ -95,7 +94,6 @@ class EncoderTuning():
             print("\nLoading ConfigurationManager...")
             clr.AddReference(os.path.join(self.CONFIG_MANAGER_PATH, "System.Configuration.ConfigurationManager.dll"))
 
-            print("Successfully loaded required types")
         except Exception as e:
             print("\nERROR: An exception occurred:")
             print(str(e))
@@ -141,7 +139,6 @@ class EncoderTuning():
         Returns:
             tuple: (travel_distance, travel_speed, distance_to_analyze)
         """
-        print(f"Calculating dynamic motion parameters for axis {axis}...")
         
         # Get necessary parameters from the controller
         # Using a default task index of 1, as is common.
@@ -197,10 +194,6 @@ class EncoderTuning():
         # Calculate total travel_distance (num6 in C# code)
         travel_distance = total_ramping_distance + distance_to_analyze + buffer_distance
 
-        print(f"  - distance_to_analyze: {distance_to_analyze:.4f}")
-        print(f"  - travel_speed: {travel_speed:.4f}")
-        print(f"  - travel_distance: {travel_distance:.4f}")
-
         return travel_distance, travel_speed, distance_to_analyze
 
     def data_config(self, n: int, freq: a1.DataCollectionFrequency, axis: str) -> a1.DataCollectionConfiguration:
@@ -254,7 +247,6 @@ class EncoderTuning():
             # Check for various sine-based encoder types
             if (wave_type in [2, 3, 10]): # 2=Sine, 3=EnDat+Sine, 10=BiSS+Sine
                 axis_specs[axis]['Encoder Type'] = 'sine'
-                print(f'Encoder Type for {axis}: Sine-based')
                 axes_to_tune.append(axis)
         
             # Get resolution for distance
@@ -296,7 +288,6 @@ class EncoderTuning():
                 fit_method = self.EllipseFit.GetMethod("Fit")
                 
                 # Invoke the 'Fit' method with the correct argument order
-                print(f'Passing Sine (as x) and Cosine (as y) data for {axis} to EllipseFit.Fit...')
                 fit_result = fit_method.Invoke(None, [sine_array, cosine_array])
                 
                 # Store the resulting EllipseData object
@@ -468,10 +459,11 @@ class EncoderTuning():
         """
         # Get axis specs and list of axes to tune
         axis_specs, axes_to_tune = self.generate_axis_specs()
-        print(f'\nAxes to be tuned: {axes_to_tune}')
         if not axes_to_tune:
             print("No axes with sine-based encoders found to tune.")
             return {}, {}
+
+        self.controller.runtime.commands.motion.enable(self.axes)
 
         results = {}
         speeds_used = {}
@@ -491,7 +483,7 @@ class EncoderTuning():
 
             # Check if axis is enabled
             self.controller.runtime.commands.motion.enable(axis)
-
+            time.sleep(3)
             # Collect data
             config = self.data_config(n, freq, axis)
             print("Starting data collection and motion...")
@@ -501,6 +493,7 @@ class EncoderTuning():
             time.sleep(1) # Wait for buffers to fill
             self.controller.runtime.data_collection.stop()
             print("Motion and data collection complete.")
+            time.sleep(5)
             results[axis] = self.controller.runtime.data_collection.get_results(config, n)
 
             # Return to start position
@@ -555,7 +548,6 @@ class EncoderTuning():
             
             num_points_before = len(velocity_command)
             num_points_after = np.sum(constant_velocity_mask)
-            print(f"  - Filtering data points. Before: {num_points_before}, After: {num_points_after}")
             
             if num_points_after == 0:
                 print(f"  - Warning: No data points at constant velocity found for axis {axis}. Using unfiltered data.")
@@ -594,21 +586,6 @@ class EncoderTuning():
 
         # Calculate the final gains from the ellipse data
         final_gains = self.calculate_final_gains(axis_ellipse_data, signal_dict)
-        
-        print(f"\n--- FINAL ENCODER TUNING RESULTS ---")
-        print(final_gains)
-
-        # Save the final gains to a .txt file
-        try:
-            with open("encoder_gains.txt", "w") as f:
-                for axis, params in final_gains.items():
-                    f.write(f"Axis: {axis}\n")
-                    for key, value in params.items():
-                        f.write(f"  {key}: {value}\n")
-                    f.write("\n")
-            print("\nSuccessfully saved final gains to encoder_gains.txt")
-        except Exception as e:
-            print(f"\nError saving gains to file: {e}")
 
         # Apply new gains to the controller
         self.apply_gains(final_gains)

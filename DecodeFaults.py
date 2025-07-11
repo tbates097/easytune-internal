@@ -6,6 +6,7 @@ Created on Fri Oct 11 14:55:16 2024
 """
 import automation1 as a1
 import logging
+import os
 
 class decode_faults:
     def __init__(self, faults_per_axis, connected_axes, controller: a1.Controller, fault_log):
@@ -17,10 +18,15 @@ class decode_faults:
             logger = logging.getLogger(controller.name)
             logger.setLevel(logging.ERROR)
             if not logger.handlers:
-                handler = logging.FileHandler(f"{controller.name}_faults.log")
-                formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-                handler.setFormatter(formatter)
-                logger.addHandler(handler)
+                username = os.getlogin()
+                logs_dir = os.path.join(f"C:\\Users\\{username}\\Documents\\Automation1")
+                if not os.path.exists(logs_dir):
+                    os.makedirs(logs_dir)
+                log_file_path = os.path.join(logs_dir, f"{controller.name}_faults.log")
+                handler = logging.FileHandler(log_file_path)
+                formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')  # ← Missing this
+                handler.setFormatter(formatter)                                           # ← Missing this
+                logger.addHandler(handler)                                                # ← Missing this
             self.fault_log = logger
         else:
             self.fault_log = fault_log
@@ -67,6 +73,8 @@ class decode_faults:
         if any(self.decoded_faults_per_axis[axis] for axis in self.decoded_faults_per_axis):
             self.log_faults()
         
+        return self.decoded_faults_per_axis
+    
     def log_faults(self):
         for axis in self.connected_axes:
             fault_value = self.decoded_faults_per_axis.get(axis)

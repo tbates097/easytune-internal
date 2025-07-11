@@ -852,6 +852,8 @@ class EasyTuneUI:
                 # Create comprehensive ui_params including stop_event
                 ui_params = {
                     'connection_type': self.connection_var.get(),
+                    'controller': self.controller,
+                    'available_axes': self.available_axes,
                     'all_axes': enabled_axes,
                     'test_type': test_type,
                     'single_axis': single_axis,
@@ -915,6 +917,7 @@ class EasyTuneUI:
         """Called when EasyTune process finishes"""
         self.start_btn.config(state='normal')
         self.stop_btn.config(state='disabled')
+        self.finish_btn.config(state='normal')
     
     def monitor_output(self):
         """Monitor the output queue and update text widget"""
