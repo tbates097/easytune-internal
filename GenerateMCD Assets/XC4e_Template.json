@@ -1,0 +1,50 @@
+{
+    "MechanicalProducts": [
+      {
+        "Name": "", 
+        "DeviceCatalogItemGuid": null,
+        "SecondaryDeviceCatalogItemGuid": null,
+        "DisplayName": "",
+        "SerialNumber": "",
+        "WasAutoDetected": false,
+        "ShouldExclude": false,
+        "ConfiguredOptions": {
+        }, 
+        "MechanicalAxes": []
+      }
+    ],
+    "ElectricalProducts": [
+      {
+        "Name": "XC4e",
+        "DisplayName": "XC4e",
+        "SerialNumber": "",
+        "WasAutoDetected": false,
+        "ShouldExclude": false,
+        "ConfiguredOptions": {
+          "Current": "",
+          "Bus Voltage": "",
+          "Expansion Board": "-EB0",
+          "Multiplier": ""
+        },
+        "ElectricalAxes": []
+      }
+    ],
+    "InterconnectedAxes": [
+      {
+        "Name": "",
+        "Index": 0,
+        "MechanicalAxis" : {
+            "DisplayName" : ""
+          },
+        "ElectricalAxis" : {
+              "DisplayName" : "XC4e"
+          }
+      }
+    ],
+    "Parameters": [],
+    "VersionInformation": {
+      "MachineSetupDataVersion": "2.11.0.3120",
+      "Automation1Version": "2.11.0.3100"
+    },
+    "ControllerType": "PcBased"
+  }

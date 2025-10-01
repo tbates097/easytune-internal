@@ -1,0 +1,90 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\tbates\\Python\\easytune-internal\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tbates\\Python\\easytune-internal\\RunEasyTune.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:RunEasyTune.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tbates\\Python\\easytune-internal\\mcd_worker.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:mcd_worker.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tbates\\Python\\easytune-internal\\Modules\\Easy_Tune_Module.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Modules\\Easy_Tune_Module.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tbates\\Python\\easytune-internal\\a1_interface.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:a1_interface.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "mcd_worker.py",
+              "DocumentMoniker": "C:\\Users\\tbates\\Python\\easytune-internal\\mcd_worker.py",
+              "RelativeDocumentMoniker": "mcd_worker.py",
+              "ToolTip": "C:\\Users\\tbates\\Python\\easytune-internal\\mcd_worker.py",
+              "RelativeToolTip": "mcd_worker.py",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-09-05T19:33:45.093Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "a1_interface.py",
+              "DocumentMoniker": "C:\\Users\\tbates\\Python\\easytune-internal\\a1_interface.py",
+              "RelativeDocumentMoniker": "a1_interface.py",
+              "ToolTip": "C:\\Users\\tbates\\Python\\easytune-internal\\a1_interface.py",
+              "RelativeToolTip": "a1_interface.py",
+              "ViewState": "AgIAAJADAAAAAAAAAAAAAKYDAABnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-09-05T12:44:32.272Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Easy_Tune_Module.py",
+              "DocumentMoniker": "C:\\Users\\tbates\\Python\\easytune-internal\\Modules\\Easy_Tune_Module.py",
+              "RelativeDocumentMoniker": "Modules\\Easy_Tune_Module.py",
+              "ToolTip": "C:\\Users\\tbates\\Python\\easytune-internal\\Modules\\Easy_Tune_Module.py",
+              "RelativeToolTip": "Modules\\Easy_Tune_Module.py",
+              "ViewState": "AgIAAB8BAAAAAAAAAAArwDcBAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-09-05T12:44:09.489Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RunEasyTune.py",
+              "DocumentMoniker": "C:\\Users\\tbates\\Python\\easytune-internal\\RunEasyTune.py",
+              "RelativeDocumentMoniker": "RunEasyTune.py",
+              "ToolTip": "C:\\Users\\tbates\\Python\\easytune-internal\\RunEasyTune.py",
+              "RelativeToolTip": "RunEasyTune.py",
+              "ViewState": "AgIAAL4LAAAAAAAAAAArwNwLAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-07-16T19:48:32.905Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

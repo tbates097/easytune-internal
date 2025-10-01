@@ -1,0 +1,61 @@
+{
+    "MechanicalProducts": [
+      {
+        "Name": "", 
+        "DeviceCatalogItemGuid": null,
+        "SecondaryDeviceCatalogItemGuid": null,
+        "DisplayName": "",
+        "SerialNumber": "",
+        "WasAutoDetected": false,
+        "ShouldExclude": false,
+        "ConfiguredOptions": {
+        }, 
+        "MechanicalAxes": []
+      }
+    ],
+    "ElectricalProducts": [
+      {
+        "Name": "XR3",
+        "DisplayName": "XR3",
+        "SerialNumber": "",
+        "WasAutoDetected": false,
+        "ShouldExclude": false,
+        "ConfiguredOptions": {
+            "Split Bus": "-SB0",
+            "Bus Voltage 1": "-VB3",
+            "Bus Voltage 2": "-VB0",
+            "Axis 1 Controller Card": "-CT4",
+            "Axis 2 Controller Card": "4",
+            "Axis 3 Controller Card": "4",
+            "Axis 4 Controller Card": "4",
+            "Axis 5 Controller Card": "4",
+            "Axis 6 Controller Card": "4",
+            "Axis 1 Slice Power Module": "-P2",
+            "Axis 2 Slice Power Module": "P2",
+            "Axis 3 Slice Power Module": "P2",
+            "Axis 4 Slice Power Module": "P2",
+            "Axis 5 Slice Power Module": "P2",
+            "Axis 6 Slice Power Module": "P2"
+        },
+        "ElectricalAxes": []
+      }
+    ],
+    "InterconnectedAxes": [
+      {
+        "Name": "",
+        "Index": 0,
+        "MechanicalAxis" : {
+            "DisplayName" : ""
+          },
+        "ElectricalAxis" : {
+              "DisplayName" : "XR3 Axis 1"
+          }
+      }
+    ],
+    "Parameters": [],
+    "VersionInformation": {
+      "MachineSetupDataVersion": "2.11.0.3120",
+      "Automation1Version": "2.11.0.3100"
+    },
+    "ControllerType": "PcBased"
+  }

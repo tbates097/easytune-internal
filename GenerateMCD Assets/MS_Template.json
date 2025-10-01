@@ -1,0 +1,55 @@
+{
+  "MechanicalProducts": [
+    {
+      "Name": "",
+      "DeviceCatalogItemGuid": null,
+      "SecondaryDeviceCatalogItemGuid": null,
+      "DisplayName": "",
+      "SerialNumber": "",
+      "WasAutoDetected": false,
+      "ShouldExclude": false,
+      "ConfiguredOptions": {
+      },
+      "MechanicalAxes": []
+    }
+  ],
+  "ElectricalProducts": [
+    {
+
+      "Name": "iXA4",
+      "DisplayName": "iXA4",
+      "SerialNumber": "",
+      "WasAutoDetected": true,
+      "ShouldExclude": false,
+      "ConfiguredOptions": {
+        "Motor Supply Voltage": "-AC",
+        "Axes": "-AX2",
+        "Current Axes 1 and 2": "-20",
+        "Current Axes 3 and 4": "",
+        "Bus Voltage": "",
+        "Expansion Board": "-EB0",
+        "Multiplier Axes 1 and 2": "-MX1",
+        "Multiplier Axes 3 and 4": ""
+      },
+      "ElectricalAxes": []
+    }
+  ],
+  "InterconnectedAxes": [
+    {
+      "Name": "",
+	  "Index": 0,
+	  "MechanicalAxis" : {
+		  "DisplayName" : ""
+		},
+	  "ElectricalAxis" : {
+			"DisplayName" : "iXA4"
+		}
+    }
+  ],
+  "Parameters": [],
+  "VersionInformation": {
+    "MachineSetupDataVersion": "2.11.0.3120",
+    "Automation1Version": "2.11.0.3100"
+  },
+  "ControllerType": "DriveBased"
+}

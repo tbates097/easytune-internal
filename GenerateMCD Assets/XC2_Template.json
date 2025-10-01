@@ -1,0 +1,51 @@
+{
+    "MechanicalProducts": [
+      {
+        "Name": "", 
+        "DeviceCatalogItemGuid": null,
+        "SecondaryDeviceCatalogItemGuid": null,
+        "DisplayName": "",
+        "SerialNumber": "",
+        "WasAutoDetected": false,
+        "ShouldExclude": false,
+        "ConfiguredOptions": {
+        }, 
+        "MechanicalAxes": []
+      }
+    ],
+    "ElectricalProducts": [
+      {
+  
+        "Name": "XC2",
+        "DisplayName": "XC2",
+        "SerialNumber": "",
+        "WasAutoDetected": false,
+        "ShouldExclude": false,
+        "ConfiguredOptions": {
+          "Current": "-10",
+          "Bus Voltage": "",
+          "Expansion Board": "-EB0",
+          "Multiplier": "-MX1"
+        },
+        "ElectricalAxes": []
+      }
+    ],
+    "InterconnectedAxes": [
+      {
+        "Name": "",
+        "Index": 0,
+        "MechanicalAxis" : {
+            "DisplayName" : ""
+          },
+        "ElectricalAxis" : {
+              "DisplayName" : "XC2"
+          }
+      }
+    ],
+    "Parameters": [],
+    "VersionInformation": {
+      "MachineSetupDataVersion": "2.11.0.3120",
+      "Automation1Version": "2.11.0.3100"
+    },
+    "ControllerType": "PcBased"
+  }

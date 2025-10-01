@@ -1,0 +1,19 @@
+Found 17 main folder(s) with EngOnly/SO_ structure:
+
+  1. 100000 Test
+  2. 643276 INRAD - Northvale - US0005841
+  3. 643422 CN Beijing Wostar Technology Ltd. - CN0103461
+  4. 643531 Altech - US0108334
+  5. 643804 Moog Components Group - Blacksburg - US0007339
+  6. 643896 UK TeraView Limited - UK0001305
+  7. 643921 Meadowcroft Enterprises Ltd. - CN0109315
+  8. 643957 UK UAB Femtika - Vilnius - UK0108804
+  9. 643983 Chroma Ate Inc. - Kuei-Shan Hsiang - TW0004309
+ 10. 644110 Precision Automated Laser Systems - US0001914
+ 11. 644141 UK UAB Femtika - Vilnius - UK0108804
+ 12. 644340 CN Changzhou Ebridge-tech Co., Ltd - CN0105407
+ 13. 644492 Symmetry Laser - US0104873
+ 14. 644725 DE Hochschule  Aalen - DE0004010
+ 15. 644736 Lumitron Technologies - US0105438
+ 16. 644758 Precision Automated Laser Systems - US0001914
+ 17. 644929 Comstar Automotive LLC USA - US0109415

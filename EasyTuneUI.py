@@ -183,7 +183,7 @@ class EasyTuneUI:
         self.header_frame.pack_propagate(False)
         
         # Title with white text on brand blue - using headline font
-        title_label = tk.Label(self.header_frame, text="EasyTune Plus Optimization Wizard", 
+        title_label = tk.Label(self.header_frame, text="EasyTune Plus", 
                               font=('D-Din', 18, 'bold'), fg='white', bg=BRAND_DARK_BLUE)
         title_label.pack(pady=20)
         
@@ -359,10 +359,21 @@ class EasyTuneUI:
         ttk.Label(self.single_config_frame, text="Select axis to tune:",
                  style='Subtitle.TLabel').pack(anchor='w', padx=10, pady=(10, 5))
         
+        # Create frame for axis and payload side by side
+        single_axis_frame = tk.Frame(self.single_config_frame, bg='white')
+        single_axis_frame.pack(fill='x', padx=10, pady=5)
+        
         self.single_axis_var = tk.StringVar()
-        self.single_axis_combo = ttk.Combobox(self.single_config_frame, textvariable=self.single_axis_var,
+        self.single_axis_combo = ttk.Combobox(single_axis_frame, textvariable=self.single_axis_var,
                                              state='readonly', width=10)
-        self.single_axis_combo.pack(anchor='w', padx=10, pady=5)
+        self.single_axis_combo.pack(side='left', padx=(0, 10))
+        
+        # Add payload field for single axis
+        ttk.Label(single_axis_frame, text="Payload:", style='Subtitle.TLabel').pack(side='left', padx=(10, 5))
+        self.single_payload_var = tk.StringVar(value="0")
+        payload_entry = ttk.Entry(single_axis_frame, textvariable=self.single_payload_var, width=10)
+        payload_entry.pack(side='left')
+        ttk.Label(single_axis_frame, text="kg", style='Subtitle.TLabel').pack(side='left', padx=(5, 0))
         
         # Multi-axis configuration
         self.multi_config_frame = tk.LabelFrame(parent, text="Multi-Axis Configuration", 
@@ -380,6 +391,7 @@ class EasyTuneUI:
         self.xy_axes_frame.pack(fill='x', pady=5)
         
         self.xy_axes_vars = {}
+        self.xy_payload_vars = {}  # New dictionary for XY payload values
         
         # Other single axes
         other_frame = tk.Frame(self.multi_config_frame, bg='white')
@@ -392,6 +404,7 @@ class EasyTuneUI:
         self.other_axes_frame.pack(fill='x', pady=5)
         
         self.other_axes_vars = {}
+        self.other_payload_vars = {}  # New dictionary for other axes payload values
         
         # Initial state
         self.update_test_config()
@@ -425,27 +438,58 @@ class EasyTuneUI:
         BRAND_DARK_BLUE = '#006298'      # PMS 7691
         BRAND_BLUE = '#00ADEF'           # PMS PROCESS BLUE  
         BRAND_CHARCOAL = '#3D4543'       # PMS 446
-        
+
         title = ttk.Label(parent, text="Execution Progress", style='Title.TLabel')
         title.pack(pady=(0, 20))
-        
+
         # Configuration summary
         summary_frame = tk.LabelFrame(parent, text="Configuration Summary", 
                                      font=('D-Din', 10, 'bold'), fg=BRAND_DARK_BLUE, bg='white')
         summary_frame.pack(fill='x', pady=10, padx=20)
-        
+
         self.summary_text = tk.Text(summary_frame, height=8, width=80, font=('Helvetica', 9),
                                    bg='white', fg=BRAND_CHARCOAL, relief='flat', bd=5)
         self.summary_text.pack(padx=10, pady=10, fill='x')
-        
+
+        # Custom Performance Target Option
+        self.custom_target_var = tk.BooleanVar(value=False)
+        self.custom_target_check = ttk.Checkbutton(
+            parent, text="Use a custom performance target",
+            variable=self.custom_target_var,
+            command=self.toggle_custom_target_slider
+        )
+        self.custom_target_check.pack(pady=(10, 0))
+
+        # Slider Frame
+        slider_frame = tk.Frame(parent, bg='white')
+        slider_frame.pack(fill='x', pady=(5, 0))
+
+        self.performance_target_var = tk.IntVar(value=0)
+        self.performance_slider = tk.Scale(
+            slider_frame, from_=-3, to=3, orient='horizontal',
+            variable=self.performance_target_var, showvalue=True,
+            length=350, tickinterval=1, resolution=1,
+            state='disabled', bg='white', highlightthickness=0,
+            fg=BRAND_DARK_BLUE, troughcolor=BRAND_CHARCOAL, activebackground=BRAND_BLUE
+        )
+        self.performance_slider.pack()
+
+        # Tick labels
+        tick_labels = [-3, -2, -1, 0, 1, 2, 3]
+        tick_frame = tk.Frame(slider_frame, bg='white')
+        tick_frame.pack(fill='x')
+        self.tick_labels_widgets = []
+        for i, val in enumerate(tick_labels):
+            lbl = tk.Label(tick_frame, text=str(val), bg='white', fg=BRAND_DARK_BLUE, font=('D-Din', 10))
+            lbl.place(relx=i/6, rely=0)  # 7 ticks, so 0/6, 1/6, ..., 6/6
+            self.tick_labels_widgets.append(lbl)
+
         # Control buttons
         control_frame = tk.Frame(parent)
         control_frame.pack(fill='x', pady=10)
-        
         self.start_btn = ttk.Button(control_frame, text="Start EasyTune Process", 
                                    style='Action.TButton', command=self.start_easytune)
         self.start_btn.pack(side='left', padx=10)
-        
         self.stop_btn = ttk.Button(control_frame, text="Stop Process", 
                                   command=self.stop_easytune, state='disabled')
         self.stop_btn.pack(side='left', padx=10)
@@ -501,9 +545,9 @@ class EasyTuneUI:
         self.prev_btn.config(state='normal' if step_num > 0 else 'disabled')
         
         if step_num == self.total_steps - 1:
-            self.next_btn.config(text="Finish", state='disabled')
+            self.next_btn.config(text="Finish", state='normal', command=self.finish)
         else:
-            self.next_btn.config(text="Next →", state='normal')
+            self.next_btn.config(text="Next →", state='normal', command=self.next_step)
             
         # Update step-specific elements
         if step_num == 1:  # System config
@@ -626,7 +670,7 @@ class EasyTuneUI:
                 self.root.after(0, self.connection_success)
                 
             except Exception as e:
-                self.root.after(0, lambda: self.connection_failed(str(e)))
+                self.root.after(0, lambda e=e: self.connection_failed(str(e)))
         
         threading.Thread(target=connect_thread, daemon=True).start()
     
@@ -695,23 +739,47 @@ class EasyTuneUI:
             widget.destroy()
         
         self.xy_axes_vars = {}
+        self.xy_payload_vars = {}
         self.other_axes_vars = {}
+        self.other_payload_vars = {}
         
         if self.available_axes:
-            # XY axes checkboxes
+            # XY axes checkboxes with payload fields
             for i, axis in enumerate(self.available_axes):
+                frame = tk.Frame(self.xy_axes_frame, bg='white')
+                frame.grid(row=i//2, column=i%2, sticky='w', padx=5, pady=2)
+                
                 var = tk.BooleanVar()
                 self.xy_axes_vars[axis] = var
-                cb = ttk.Checkbutton(self.xy_axes_frame, text=axis, variable=var)
-                cb.grid(row=i//4, column=i%4, sticky='w', padx=5, pady=2)
+                cb = ttk.Checkbutton(frame, text=axis, variable=var)
+                cb.pack(side='left', padx=(0, 5))
+                
+                # Add payload field
+                ttk.Label(frame, text="Payload:", style='Subtitle.TLabel').pack(side='left', padx=(5, 5))
+                payload_var = tk.StringVar(value="0")
+                self.xy_payload_vars[axis] = payload_var
+                payload_entry = ttk.Entry(frame, textvariable=payload_var, width=10)
+                payload_entry.pack(side='left')
+                ttk.Label(frame, text="kg", style='Subtitle.TLabel').pack(side='left', padx=(5, 0))
             
-            # Other axes checkboxes  
+            # Other axes checkboxes with payload fields
             for i, axis in enumerate(self.available_axes):
+                frame = tk.Frame(self.other_axes_frame, bg='white')
+                frame.grid(row=i//2, column=i%2, sticky='w', padx=5, pady=2)
+                
                 var = tk.BooleanVar()
                 self.other_axes_vars[axis] = var
-                cb = ttk.Checkbutton(self.other_axes_frame, text=axis, variable=var)
-                cb.grid(row=i//4, column=i%4, sticky='w', padx=5, pady=2)
-    
+                cb = ttk.Checkbutton(frame, text=axis, variable=var)
+                cb.pack(side='left', padx=(0, 5))
+                
+                # Add payload field
+                ttk.Label(frame, text="Payload:", style='Subtitle.TLabel').pack(side='left', padx=(5, 5))
+                payload_var = tk.StringVar(value="0")
+                self.other_payload_vars[axis] = payload_var
+                payload_entry = ttk.Entry(frame, textvariable=payload_var, width=10)
+                payload_entry.pack(side='left')
+                ttk.Label(frame, text="kg", style='Subtitle.TLabel').pack(side='left', padx=(5, 0))
+
     def update_axis_params(self):
         """Update axis parameters based on test configuration"""
         # Clear existing
@@ -849,7 +917,23 @@ class EasyTuneUI:
                     xy_axes = [axis for axis, var in self.xy_axes_vars.items() if var.get()]
                     other_axes = [axis for axis, var in self.other_axes_vars.items() if var.get()]
                 
-                # Create comprehensive ui_params including stop_event
+                # Collect payload values based on test type
+                payload_values = {}
+                if test_type == "single":
+                    single_axis = self.single_axis_var.get()
+                    payload_values[single_axis] = float(self.single_payload_var.get())
+                else:
+                    # Collect XY axes payload values
+                    for axis, var in self.xy_axes_vars.items():
+                        if var.get():
+                            payload_values[axis] = float(self.xy_payload_vars[axis].get())
+                    
+                    # Collect other axes payload values
+                    for axis, var in self.other_axes_vars.items():
+                        if var.get():
+                            payload_values[axis] = float(self.other_payload_vars[axis].get())
+                
+                # Create comprehensive ui_params including payload values
                 ui_params = {
                     'connection_type': self.connection_var.get(),
                     'controller': self.controller,
@@ -860,8 +944,10 @@ class EasyTuneUI:
                     'xy_axes': xy_axes,
                     'other_axes': other_axes,
                     'axes_params': axes_params,
+                    'payload_values': payload_values,  # Add payload values to ui_params
                     'cal_file_ready': self.cal_type_var.get() == "with_cal",
-                    'stop_event': self.stop_event  # Pass stop event to EasyTune process
+                    'stop_event': self.stop_event,
+                    'performance_target': self.performance_target_var.get() if self.custom_target_var.get() else None
                 }
                 
                 # Single call to main() - it handles everything!
@@ -917,7 +1003,6 @@ class EasyTuneUI:
         """Called when EasyTune process finishes"""
         self.start_btn.config(state='normal')
         self.stop_btn.config(state='disabled')
-        self.finish_btn.config(state='normal')
     
     def monitor_output(self):
         """Monitor the output queue and update text widget"""
@@ -931,6 +1016,22 @@ class EasyTuneUI:
             pass
         finally:
             self.root.after(100, self.monitor_output)
+
+    def toggle_custom_target_slider(self):
+        BRAND_DARK_BLUE = '#006298'
+        BRAND_CHARCOAL = '#3D4543'
+        if self.custom_target_var.get():
+            self.performance_slider.config(state='normal', troughcolor=BRAND_CHARCOAL, fg=BRAND_DARK_BLUE)
+            for lbl in self.tick_labels_widgets:
+                lbl.config(fg=BRAND_DARK_BLUE)
+        else:
+            self.performance_slider.config(state='disabled', troughcolor='#cccccc', fg='#cccccc')
+            for lbl in self.tick_labels_widgets:
+                lbl.config(fg='#cccccc')
+
+    def finish(self):
+        """Handle final actions and close the window."""
+        self.root.quit()
 
 def center_window(root, width=900, height=700):
     """Center the window on the screen"""

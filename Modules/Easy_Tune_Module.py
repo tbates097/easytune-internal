@@ -137,10 +137,10 @@ class Easy_Tune_Module():
         widget.setLayout(layout)
         self.gui.easy_tune_module.addWidget(widget)
 
-    def run_easy_tune(self, fr_filepath=None, verification=False, sensitivity=None) -> None:
+    def run_easy_tune(self, fr_filepath=None, verification=False, performance_target=None) -> None:
         """Launches EasyTune in a separate thread."""
         self.verification = verification
-        self.sensitivity = sensitivity
+        self.performance_target = performance_target
         # For headless mode (A1TestBed.py)
         if self.block_layout_module is None:
             if fr_filepath is None:
@@ -306,7 +306,7 @@ class Easy_Tune_Module():
         [self.did_easy_tune_succeed, self.servo_controller, 
          number_of_generations, optimization_time_ms, 
          self.zip_directory, self.exception] = \
-            a1_interface.run_easy_tune(block_layout_with_data.shaped, block_layout_with_data.a1_data, verification=self.verification, sensitivity=self.sensitivity)
+            a1_interface.run_easy_tune(block_layout_with_data.shaped, block_layout_with_data.a1_data, verification=self.verification, performance_target=self.performance_target)
         
         
         print("\nEasyTune Results:")

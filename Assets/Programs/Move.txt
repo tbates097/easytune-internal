@@ -1,0 +1,26 @@
+program
+	// Program variables
+	
+	// Set up task motion parameters
+	
+	// Set up data collection
+	DataCollectionStop()
+	DataCollectionReset()
+	for $index = 0 to length($axes)-1
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.PositionFeedback)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.PositionCommand)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.PositionError)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.VelocityCommand)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.VelocityFeedback)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.AccelerationCommand)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.AccelerationFeedback)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.CurrentCommand)
+		DataCollectionAddAxisSignal($axes[$index], AxisDataSignal.CurrentFeedback)
+	end	
+	// Execute motion
+	DataCollectionStart($filename, $numsamples, $sampletime)
+	MoveAbsolute($axes, $distance, $speed)
+	WaitForMotionDone($axes)
+	Dwell(2)
+	DataCollectionStop()
+end

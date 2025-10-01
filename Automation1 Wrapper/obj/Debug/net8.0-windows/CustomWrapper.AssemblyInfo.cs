@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CustomWrapper")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+450de2c12eef9f61efe09cac7073d6a553205bef")]
 [assembly: System.Reflection.AssemblyProductAttribute("CustomWrapper")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CustomWrapper")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

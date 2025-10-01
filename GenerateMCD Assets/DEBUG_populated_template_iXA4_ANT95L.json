@@ -1,0 +1,57 @@
+{
+  "MechanicalProducts": [
+    {
+      "Name": "ANT95L",
+      "DeviceCatalogItemGuid": null,
+      "SecondaryDeviceCatalogItemGuid": null,
+      "DisplayName": "ANT95L",
+      "SerialNumber": "",
+      "WasAutoDetected": false,
+      "ShouldExclude": false,
+      "ConfiguredOptions": {
+        "Travel": "-025",
+        "Feedback": "-E1",
+        "Cable Management": "-CMS2"
+      },
+      "MechanicalAxes": []
+    }
+  ],
+  "ElectricalProducts": [
+    {
+      "Name": "iXA4",
+      "DisplayName": "iXA4",
+      "SerialNumber": "",
+      "WasAutoDetected": true,
+      "ShouldExclude": false,
+      "ConfiguredOptions": {
+        "Motor Supply Voltage": "-AC",
+        "Axes": "-AX2",
+        "Current Axes 1 and 2": "-10",
+        "Current Axes 3 and 4": "",
+        "Bus Voltage": "160V",
+        "Expansion Board": "-EB0",
+        "Multiplier Axes 1 and 2": "-MX1",
+        "Multiplier Axes 3 and 4": ""
+      },
+      "ElectricalAxes": []
+    }
+  ],
+  "InterconnectedAxes": [
+    {
+      "Name": "ST01",
+      "Index": 0,
+      "MechanicalAxis": {
+        "DisplayName": "ANT95L"
+      },
+      "ElectricalAxis": {
+        "DisplayName": "iXA4 Axis 1"
+      }
+    }
+  ],
+  "Parameters": [],
+  "VersionInformation": {
+    "MachineSetupDataVersion": "2.11.0.3120",
+    "Automation1Version": "2.11.0.3100"
+  },
+  "ControllerType": "DriveBased"
+}

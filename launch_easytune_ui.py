@@ -19,7 +19,7 @@ try:
         main()
         
 except ImportError as e:
-    print(f"❌ Import Error: {e}")
+    print(f"launch_easytune_ui.py - line 22: ❌ Import Error: {e}")
     print("Please ensure all required modules are installed:")
     print("- tkinter (usually comes with Python)")
     print("- automation1")
