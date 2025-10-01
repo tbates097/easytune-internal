@@ -8,13 +8,12 @@ from GenerateMCD_v2 import AerotechController
 def extract_mcd_params(mcd_path, mcd_name):
     """Worker function to extract MCD parameters using specific DLL version"""
     try:
-        ms_params = AerotechController(mcd_name)
+        # Use a controller configured for in-memory operations (no file saving)
+        ms_params = AerotechController.without_file_saving()
 
         ms_params.initialize()
 
-        #read_from_file = ms_params.MachineControllerDefinition.GetMethod("ReadFromFile")
-        #mcd_obj = ms_params._read_mcd_from_file(mcd_path)
-
+        # Recalculate from the provided MCD file and get a fresh MCD object
         ms_mcd_obj, _, _ = ms_params.calculate_from_current_mcd(mcd_path)
         print("About to call inspect_mcd_object")
         servo_params, feedforward_params = ms_params.inspect_mcd_object(ms_mcd_obj)

@@ -393,7 +393,7 @@ class DriveConfigManager:
             return None
             
         template_file = config.get('template_file', f"{drive_type}_Template.json")
-        template_path = os.path.join(self.base_dir, "GenerateMCD Assets", template_file)
+        template_path = os.path.join(self.base_dir, "GenerateMCD_Assets", template_file)
         
         return {
             'type': drive_type,
@@ -428,7 +428,7 @@ class McdProcessor:
         self.initialized = False
         
         # Template directory for drive-specific templates
-        self.template_dir = os.path.join(self.base_dir, "GenerateMCD Assets")
+        self.template_dir = os.path.join(self.base_dir, "GenerateMCD_Assets")
         
         # Initialize drive configuration manager
         self.drive_config_manager = DriveConfigManager(drive_config_path, self.base_dir)
@@ -437,7 +437,7 @@ class McdProcessor:
         """Setup paths to required DLLs"""
         # Config manager path
         self.config_manager_path = os.path.join(
-            self.base_dir, "GenerateMCD Assets", 
+            self.base_dir, "GenerateMCD_Assets", 
             "System.Configuration.ConfigurationManager.8.0.0", 
             "lib", "netstandard2.0"
         )
@@ -490,8 +490,8 @@ class McdProcessor:
         self.JObject = None
         
         # Template paths
-        self.template_path = os.path.join(self.base_dir, "GenerateMCD Assets", "MS_Template.json")
-        self.working_json_path = os.path.join(os.getcwd(), "GenerateMCD Assets", "WorkingTemplate.json")
+        self.template_path = os.path.join(self.base_dir, "GenerateMCD_Assets", "MS_Template.json")
+        self.working_json_path = os.path.join(os.getcwd(), "GenerateMCD_Assets", "WorkingTemplate.json")
     
     def initialize(self):
         """Load .NET assemblies and initialize types"""
@@ -925,7 +925,7 @@ class McdProcessor:
         
     def get_available_drive_types(self):
         """
-        Auto-scan GenerateMCD Assets folder for available drive templates
+        Auto-scan GenerateMCD_Assets folder for available drive templates
         
         Returns:
             list: Available drive types sorted alphabetically
@@ -1768,6 +1768,11 @@ class AerotechController:
             if current_dir not in sys.path:
                 sys.path.insert(0, current_dir)
             
+            # Add assets directory to path
+            assets_dir = os.path.join(current_dir, "GenerateMCD_Assets")
+            sys.path.insert(0, assets_dir)
+            
+            # Import the original GUI class
             from drive_config_gui import DriveConfigurationGUI
             
             # Create and show GUI
