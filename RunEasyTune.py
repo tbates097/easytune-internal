@@ -34,7 +34,7 @@ from Modules.EncoderTuning import EncoderTuning
 
 sys.path.append(r"K:\10. Released Software\Shared Python Programs\production-2.1")
 from a1_file_handler import DatFile
-from GenerateMCD import AerotechController
+from GenerateMCD_v2 import AerotechController
 
 global so_dir
 so_dir = None
