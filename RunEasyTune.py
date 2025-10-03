@@ -3086,7 +3086,12 @@ def main(test=None, controller=None, axes=None, test_type=None, all_axes=None, u
             check_stop_signal(stop_event)
             test_type = ui_params.get('test_type', 'single')
             axes_params = ui_params.get('axes_params')
-            performance_target = ui_params.get('performance_target', 0)
+            # Ensure performance_target is an int and never None
+            _pt_val = ui_params.get('performance_target', 0)
+            try:
+                performance_target = int(_pt_val) if _pt_val is not None else 0
+            except (ValueError, TypeError):
+                performance_target = 0
             print(f"Performance Target: {performance_target}")
             if test_type == 'multi':
                 # Get XY axes and other axes from UI params

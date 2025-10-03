@@ -947,7 +947,7 @@ class EasyTuneUI:
                     'payload_values': payload_values,  # Add payload values to ui_params
                     'cal_file_ready': self.cal_type_var.get() == "with_cal",
                     'stop_event': self.stop_event,
-                    'performance_target': self.performance_target_var.get() if self.custom_target_var.get() else None
+'performance_target': int(self.performance_target_var.get()) if self.custom_target_var.get() else 0
                 }
                 
                 # Single call to main() - it handles everything!
