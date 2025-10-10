@@ -2010,7 +2010,7 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
         if rotary and axis_limits[axis][0] == 0 and axis_limits[axis][1] == 0:
             
             move_name = 'Positive'
-            filename = f"stage_performance_{test_type}_{move_name}.dat"
+            filename = f"stage_performance_{axis}_{move_name}.dat"
             
             move_results = move_profile(controller, axis_keys, velocity, n, filename, so_dir, distance)
 
@@ -2022,7 +2022,7 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             results['pos'] = move_results
 
             move_name = 'Negative'
-            filename = f"stage_performance_{test_type}_{move_name}.dat"
+            filename = f"stage_performance_{axis}_{move_name}.dat"
             
             move_results = move_profile(controller, axis_keys, velocity, n, filename, so_dir, [0])
 
@@ -2047,7 +2047,7 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             time.sleep(0.5)
 
             move_name = 'Positive'
-            filename = f"stage_performance_{test_type}_{move_name}.dat"
+            filename = f"stage_performance_{axis}_{move_name}.dat"
             
             move_results = move_profile(controller, axis_keys, velocity, n, filename, so_dir, [pos_end])
             axis_faults = check_for_faults(controller, all_axes)
@@ -2058,7 +2058,7 @@ def validate_stage_performance(controller: a1.Controller, axes_dict: dict, test_
             results['pos'] = move_results
 
             move_name = 'Negative'
-            filename = f"stage_performance_{test_type}_{move_name}.dat"
+            filename = f"stage_performance_{axis}_{move_name}.dat"
             
             move_results = move_profile(controller, axis_keys, velocity, n, filename, so_dir, [neg_end])
 
